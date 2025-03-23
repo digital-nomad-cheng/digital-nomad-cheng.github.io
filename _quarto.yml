@@ -8,12 +8,15 @@ website:
     left:
       - href: index.qmd
         text: Home
-      - about.qmd
       - href: projects.qmd
         text: Projects
+      - about.qmd
+      
     right:
       - icon: github
         href: https://github.com/digital-nomad-cheng
+      - icon: linkedin
+        href: https://www.linkedin.com/in/yuhua-cheng-nomad/
 
 format:
   html:
