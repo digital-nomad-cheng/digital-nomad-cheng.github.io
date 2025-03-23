@@ -1,5 +1,12 @@
 [
   {
+    "objectID": "projects.html",
+    "href": "projects.html",
+    "title": "Nomad's Wonderland",
+    "section": "",
+    "text": "List of projects I worked with."
+  },
+  {
     "objectID": "about.html",
     "href": "about.html",
     "title": "About",
@@ -9,7 +16,7 @@
   {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "Digital Nomad Cheng’s Blogs",
+    "title": "Blogs",
     "section": "",
     "text": "This is a Quarto website.\nTo learn more about Quarto websites visit https://quarto.org/docs/websites."
   }
