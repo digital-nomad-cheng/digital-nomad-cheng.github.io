@@ -1,5 +1,5 @@
 ---
-title: "blogs"
+title: "Blogs"
 ---
 
 This is a Quarto website.
