@@ -3,13 +3,17 @@ project:
   output-dir: docs
 
 website:
-  title: "blogs"
+  title: "Nomad's Wonderland"
   navbar:
     left:
       - href: index.qmd
         text: Home
       - about.qmd
-
+      - href: projects.qmd
+        text: Projects
+    right:
+      - icon: github
+        href: https://github.com/digital-nomad-cheng
 
 format:
   html:
