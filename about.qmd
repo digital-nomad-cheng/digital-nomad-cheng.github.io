@@ -2,4 +2,10 @@
 title: "About"
 ---
 
-I am machine learning enginer with focus on computer vision and high performance computing.
+I am a machine learning enginer with focus on computer vision and effcient machine learning solutions on edge based in Sweden.
+
+
+I mainly work with image related tasks nowadays from image signal processing, object detection/tracking/segmentation, face recognition systems.
+
+
+

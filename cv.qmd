@@ -1,0 +1,24 @@
+---
+title: "[Curriculum Vitae](files/cv.pdf)"
+format:
+  html:
+    css: styles.css
+---
+
+## Experience
+
+### Machine Learning Engineer | Verisure Innovation AB
+*June 2024 - Present*
+
+- Building computer vision solutions for edge devices
+
+## Education
+
+- **Master's Degree** in High Performance Computing, Chalmers University of Technology, Sweden
+- **Bachelor's Degree** in Electrical Engineering, Beijing Normal University, China
+
+## Skills
+- **Specilization**: Digital Image Processing, Computer Vision, Object Detection, Object Segmentation, Edge Computing, Efficient ML
+- **Tools**: PyTorch/Keras/TensorFlow, TFLite/Micro
+- **Programming Languages**: Python/C++
+- 
