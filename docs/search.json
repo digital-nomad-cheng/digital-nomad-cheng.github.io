@@ -7,11 +7,39 @@
     "text": "List of projects I worked with."
   },
   {
+    "objectID": "cv.html",
+    "href": "cv.html",
+    "title": "Curriculum Vitae",
+    "section": "",
+    "text": "June 2024 - Present\n\nBuilding computer vision solutions for edge devices"
+  },
+  {
+    "objectID": "cv.html#experience",
+    "href": "cv.html#experience",
+    "title": "Curriculum Vitae",
+    "section": "",
+    "text": "June 2024 - Present\n\nBuilding computer vision solutions for edge devices"
+  },
+  {
+    "objectID": "cv.html#education",
+    "href": "cv.html#education",
+    "title": "Curriculum Vitae",
+    "section": "Education",
+    "text": "Education\n\nMaster’s Degree in High Performance Computing, Chalmers University of Technology, Sweden\nBachelor’s Degree in Electrical Engineering, Beijing Normal University, China"
+  },
+  {
+    "objectID": "cv.html#skills",
+    "href": "cv.html#skills",
+    "title": "Curriculum Vitae",
+    "section": "Skills",
+    "text": "Skills\n\nSpecilization: Digital Image Processing, Computer Vision, Object Detection, Object Segmentation, Edge Computing, Efficient ML\nTools: PyTorch/Keras/TensorFlow, TFLite/Micro\nProgramming Languages: Python/C++"
+  },
+  {
     "objectID": "about.html",
     "href": "about.html",
     "title": "About",
     "section": "",
-    "text": "I am machine learning enginer with focus on computer vision and high performance computing."
+    "text": "I am a machine learning enginer with focus on computer vision and effcient machine learning solutions on edge based in Sweden.\nI mainly work with image related tasks nowadays from image signal processing, object detection/tracking/segmentation, face recognition systems."
   },
   {
     "objectID": "index.html",
