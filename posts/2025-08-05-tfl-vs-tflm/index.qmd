@@ -1,0 +1,9 @@
+---
+title: "Difference between TFLite Python API vs TFLite Micro Python API"
+author: "NomadC"
+date: "2025-08-05"
+categories: [tflite, code, tinyml]
+image: "image.jpg"
+---
+
+This is a post with executable code.
