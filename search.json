@@ -1,12 +1,5 @@
 [
   {
-    "objectID": "projects.html",
-    "href": "projects.html",
-    "title": "Nomad's Wonderland",
-    "section": "",
-    "text": "List of projects I worked with."
-  },
-  {
     "objectID": "cv.html",
     "href": "cv.html",
     "title": "Curriculum Vitae",
@@ -35,17 +28,52 @@
     "text": "Skills\n\nSpecilization: Digital Image Processing, Computer Vision, Object Detection, Object Segmentation, Edge Computing, Efficient ML\nTools: PyTorch/Keras/TensorFlow, TFLite/Micro\nProgramming Languages: Python/C++"
   },
   {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Blogs",
+    "section": "",
+    "text": "Difference between TFLite Python API vs TFLite Micro Python API\n\n\n\n\n\n\ntflite\n\n\ncode\n\n\ntinyml\n\n\n\n\n\n\n\n\n\nAug 5, 2025\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\n\n\n\nnews\n\n\n\n\n\n\n\n\n\nAug 2, 2025\n\n\nTristan O’Malley\n\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "posts/2025-08-05-tfl-vs-tflm/index.html",
+    "href": "posts/2025-08-05-tfl-vs-tflm/index.html",
+    "title": "Difference between TFLite Python API vs TFLite Micro Python API",
+    "section": "",
+    "text": "TFLite Micro is the most popular Neural Network inference engine for micro CPUs. It’s designed for light weight model running on low power hardwares.\nMost common scenario is you use some training framework like PyTorch and TensorFlow, quantize it to tflite model. Finally you run your model on embedded device through the TFLite Micro library. However, the precision of the model usually loses during the quantization process. People would like to use the TFLite Python API to run the model on their computer, and verify the accuracy of the model is reduced to an acceptable level before deploying it to the embedded device. The problem is that the TFLite Python API cannot really simulate the model’s precision when running on the embedded device with TFLite Micro library. There are already lots of discussions about this issue, see github discussions 1 and 2\nUnknown to many people, TFLite Micro has a Python API, but the TFLite Micro Python API is different from the TFLite Python API. The TFLite Micro Python API is designed to run on the same principles as the TFLite Micro C++ library, which means it can provide a more accurate simulation of how the model will perform on embedded devices.\nIn this blog I will compare the TFLite Python API and the TFLite Micro Python API differences, and show how the two different APIs can be used to run the same model but have different results."
+  },
+  {
+    "objectID": "posts/2025-08-05-tfl-vs-tflm/index.html#tflite-python-api",
+    "href": "posts/2025-08-05-tfl-vs-tflm/index.html#tflite-python-api",
+    "title": "Difference between TFLite Python API vs TFLite Micro Python API",
+    "section": "TFLite Python API",
+    "text": "TFLite Python API\nThe TFLite was previously decoupled from TensorFlow and was a standalone library called LiteRT.\n\nLoading model:\n\nfrom ai-edge-litert.interpreter import Interpreter\ninterpreter = Interpreter(model_path=model)\n\nAllocate tensors:\n\ninterpreter.allocate_tensors()\nIt performs dynamic memory allocation for: Input/output tensors: Allocates memory buffers for model inputs and outputs Intermediate tensors: Allocates memory for all intermediate computation results between layers Temporary buffers: Allocates workspace memory needed during inference Graph optimization: Finalizes the computation graph and prepares it for execution\n\nGet input and output tensors details:\n\ninput_details = interpreter.get_input_details()\noutput_details = interpreter.get_output_details()\n\nSet input tensor:\n\ninterpreter.set_tensor(input_details[0]['index'], x)\n\nRun inference:\n\ninterpreter.invoke()\n\nGet output tensor:\n\noutput_data = interpreter.get_tensor(output_details[0]['index'])"
+  },
+  {
+    "objectID": "posts/2025-08-05-tfl-vs-tflm/index.html#tflite-micro-python-api",
+    "href": "posts/2025-08-05-tfl-vs-tflm/index.html#tflite-micro-python-api",
+    "title": "Difference between TFLite Python API vs TFLite Micro Python API",
+    "section": "TFLite Micro Python API",
+    "text": "TFLite Micro Python API\nThe TFLite Micro Python API is designed to run on the same principles as the TFLite Micro C++ library, it’s more aligned with the C++ API. 1. Loading model, there are two ways to load the model file, one is from file, another is from bytearray.\nfrom tflite_micro.python.tflite_micro import runtime\n# Load from file\ninterpreter = runtime.Interpreter.from_file(model_path=model)\n# Load from bytearray\ninterpreter = runtime.Interpreter.from_bytes(model=model_bytes)\n\nThere is no need to allocate tensors. TFLite Micro pre-allocates all memory at compile time or initialization using a fixed-size arena. Embedded systems often lack heap allocation or have strict memory constraints, so TFLite Micro avoids malloc/free entirely.\nGet input and output tensors details:\n\ninput_details = interpreter.get_input_details(index)\noutput_details = interpreter.get_output_details(index)\nCompare to TFLite Python API where you can get all input and output details through one function call. In TFLite Micro Python API, you need to specify the index of the input or output tensor to get its details. For example, if you have multiple inputs or outputs, you can get the details of each one by specifying its index:\ninput_details = interpreter.get_input_details(0)  # Get details of first input tensor\noutput_details = interpreter.get_output_details(1)  # Get details of second output tensor\n\nSet input tensor:\n\n# Set input tensor using the input index\ninterpreter.set_input(x, 0)\n# If you have second input tensor:\ninterpreter.set_input(y, 1)\nCompared to TFLite Python API where you set the input tensor using the input details index, in TFLite Micro Python API, you set the input tensor using the input index directly. 5. Run inference:\ninterpreter.invoke()\n\nGet output tensor:\n\noutput_data = interpreter.get_output(0)"
+  },
+  {
+    "objectID": "projects.html",
+    "href": "projects.html",
+    "title": "Nomad's Wonderland",
+    "section": "",
+    "text": "List of projects I worked with."
+  },
+  {
+    "objectID": "posts/welcome/index.html",
+    "href": "posts/welcome/index.html",
+    "title": "Welcome To My Blog",
+    "section": "",
+    "text": "This is the first post in a Quarto blog. Welcome!\n\nSince this post doesn’t specify an explicit image, the first image in the post will be used in the listing page of posts."
+  },
+  {
     "objectID": "about.html",
     "href": "about.html",
     "title": "About",
     "section": "",
     "text": "I am a machine learning enginer with focus on computer vision and effcient machine learning solutions on edge based in Sweden.\nI mainly work with image related tasks nowadays from image signal processing, object detection/tracking/segmentation, face recognition systems."
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Blogs",
-    "section": "",
-    "text": "This is a Quarto website.\nTo learn more about Quarto websites visit https://quarto.org/docs/websites."
   }
 ]

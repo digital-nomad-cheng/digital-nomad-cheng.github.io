@@ -1,19 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://digital-nomad-cheng.github.io/projects.html</loc>
-    <lastmod>2025-03-23T12:41:10.219Z</lastmod>
-  </url>
-  <url>
     <loc>https://digital-nomad-cheng.github.io/cv.html</loc>
-    <lastmod>2025-04-14T19:43:23.085Z</lastmod>
-  </url>
-  <url>
-    <loc>https://digital-nomad-cheng.github.io/about.html</loc>
-    <lastmod>2025-04-14T19:43:46.372Z</lastmod>
+    <lastmod>2025-08-05T15:34:23.191Z</lastmod>
   </url>
   <url>
     <loc>https://digital-nomad-cheng.github.io/index.html</loc>
-    <lastmod>2025-03-23T12:34:35.351Z</lastmod>
+    <lastmod>2025-08-05T15:34:23.196Z</lastmod>
+  </url>
+  <url>
+    <loc>https://digital-nomad-cheng.github.io/posts/2025-08-05-tfl-vs-tflm/index.html</loc>
+    <lastmod>2025-08-05T19:03:36.468Z</lastmod>
+  </url>
+  <url>
+    <loc>https://digital-nomad-cheng.github.io/projects.html</loc>
+    <lastmod>2025-08-05T15:34:23.197Z</lastmod>
+  </url>
+  <url>
+    <loc>https://digital-nomad-cheng.github.io/posts/welcome/index.html</loc>
+    <lastmod>2025-08-05T15:34:23.197Z</lastmod>
+  </url>
+  <url>
+    <loc>https://digital-nomad-cheng.github.io/about.html</loc>
+    <lastmod>2025-08-05T15:34:23.191Z</lastmod>
   </url>
 </urlset>
