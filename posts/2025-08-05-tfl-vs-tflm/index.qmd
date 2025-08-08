@@ -4,7 +4,7 @@ filters:
 title: "Difference between TFLite Python API vs TFLite Micro Python API"
 author: "NomadC"
 date: "2025-08-05"
-categories: [tflite, code, tinyml]
+categories: [tflite, tflite-micro, code, tinyml]
 image: "image.jpg"
 ---
 
