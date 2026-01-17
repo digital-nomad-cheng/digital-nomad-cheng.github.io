@@ -1,0 +1,184 @@
+[
+  {
+    "objectID": "cv.html",
+    "href": "cv.html",
+    "title": "Curriculum Vitae",
+    "section": "",
+    "text": "June 2024 - Present\n\nBuilding computer vision solutions for edge devices"
+  },
+  {
+    "objectID": "cv.html#experience",
+    "href": "cv.html#experience",
+    "title": "Curriculum Vitae",
+    "section": "",
+    "text": "June 2024 - Present\n\nBuilding computer vision solutions for edge devices"
+  },
+  {
+    "objectID": "cv.html#education",
+    "href": "cv.html#education",
+    "title": "Curriculum Vitae",
+    "section": "Education",
+    "text": "Education\n\nMaster’s Degree in High Performance Computing, Chalmers University of Technology, Sweden\nBachelor’s Degree in Electrical Engineering, Beijing Normal University, China"
+  },
+  {
+    "objectID": "cv.html#skills",
+    "href": "cv.html#skills",
+    "title": "Curriculum Vitae",
+    "section": "Skills",
+    "text": "Skills\n\nSpecilization: Digital Image Processing, Computer Vision, Object Detection, Object Segmentation, Edge Computing, Efficient ML\nTools: PyTorch/Keras/TensorFlow, TFLite/Micro\nProgramming Languages: Python/C++"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Blogs",
+    "section": "",
+    "text": "100 Days of Polars - Day 001: Polars Selectors\n\n\n\n\n\n\npolars\n\n\ndata-engineering\n\n\n100-days-of-polars\n\n\n\nPolars selectors for efficient column selection\n\n\n\n\n\nJan 17, 2026\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\nDifference between TFLite Python API vs TFLite Micro Python API\n\n\n\n\n\n\ntflite\n\n\ntflite-micro\n\n\ncode\n\n\ntinyml\n\n\n\n\n\n\n\n\n\nAug 5, 2025\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\n\n\n\nnews\n\n\n\n\n\n\n\n\n\nAug 2, 2025\n\n\nTristan O’Malley\n\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "posts/2025-08-05-tfl-vs-tflm/index.html",
+    "href": "posts/2025-08-05-tfl-vs-tflm/index.html",
+    "title": "Difference between TFLite Python API vs TFLite Micro Python API",
+    "section": "",
+    "text": "TFLite Micro is the most popular Neural Network inference engine for micro CPUs. It’s designed for light weight model running on low power hardwares.\nMost common scenario is you use some training framework like PyTorch and TensorFlow, quantize it to tflite model. Finally you run your model on embedded device through the TFLite Micro library. However, the precision of the model usually loses during the quantization process. People would like to use the TFLite Python API to run the model on their computer, and verify the accuracy of the model is reduced to an acceptable level before deploying it to the embedded device. The problem is that the TFLite Python API cannot really simulate the model’s precision when running on the embedded device with TFLite Micro library. There are already lots of discussions about this issue, see github discussions 1 and 2\nUnknown to many people, TFLite Micro has a Python API, but the TFLite Micro Python API is different from the TFLite Python API. The TFLite Micro Python API is designed to run on the same principles as the TFLite Micro C++ library, which means it can provide a more accurate simulation of how the model will perform on embedded devices.\nIn this blog I will compare the TFLite Python API and the TFLite Micro Python API differences, and show how the two different APIs can be used to run the same model but have different results."
+  },
+  {
+    "objectID": "posts/2025-08-05-tfl-vs-tflm/index.html#tflite-python-api",
+    "href": "posts/2025-08-05-tfl-vs-tflm/index.html#tflite-python-api",
+    "title": "Difference between TFLite Python API vs TFLite Micro Python API",
+    "section": "TFLite Python API",
+    "text": "TFLite Python API\nThe TFLite was previously decoupled from TensorFlow and was a standalone library called LiteRT now.\n\nLoading model:\nfrom ai-edge-litert.interpreter import Interpreter\ninterpreter = Interpreter(model_path=model)\nAllocate tensors:\ninterpreter.allocate_tensors()\nIt performs dynamic memory allocation for: a. allocates memory buffers for model inputs and outputs, b. allocates memory for all intermediate computation results between layers, c. allocates workspace memory needed during inference, d. finalizes the computation graph and prepares it for execution.\nGet input and output tensors details:\ninput_details = interpreter.get_input_details()\noutput_details = interpreter.get_output_details()\nSet input tensor:\ninterpreter.set_tensor(input_details[0]['index'], x)\nRun inference:\ninterpreter.invoke()\nGet output tensor:\noutput_data = interpreter.get_tensor(output_details[0]['index'])"
+  },
+  {
+    "objectID": "posts/2025-08-05-tfl-vs-tflm/index.html#tflite-micro-python-api",
+    "href": "posts/2025-08-05-tfl-vs-tflm/index.html#tflite-micro-python-api",
+    "title": "Difference between TFLite Python API vs TFLite Micro Python API",
+    "section": "TFLite Micro Python API",
+    "text": "TFLite Micro Python API\nThe TFLite Micro Python API is designed to run on the same principles as the TFLite Micro C++ library, it’s more aligned with the C++ API.\n\nLoading model, there are two ways to load the model file, one is from file, another is from bytearray.\nfrom tflite_micro.python.tflite_micro import runtime\n# Load from file\ninterpreter = runtime.Interpreter.from_file(model_path=model)\n# Load from bytearray\ninterpreter = runtime.Interpreter.from_bytes(model=model_bytes)\nThere is no need to allocate tensors. TFLite Micro pre-allocates all memory at compile time or initialization using a fixed-size arena. Embedded systems often lack heap allocation or have strict memory constraints, so TFLite Micro avoids malloc/free entirely.\nGet input and output tensors details:\ninput_details = interpreter.get_input_details(index)\noutput_details = interpreter.get_output_details(index)\nCompare to TFLite Python API where you can get all input and output details through one function call. In TFLite Micro Python API, you need to specify the index of the input or output tensor to get its details. For example, if you have multiple inputs or outputs, you can get the details of each one by specifying its index:\ninput_details = interpreter.get_input_details(0)  # Get details of first input tensor\noutput_details = interpreter.get_output_details(1)  # Get details of second output tensor\nSet input tensor:\n# Set input tensor using the input index\ninterpreter.set_input(x, 0)\n# If you have second input tensor:\ninterpreter.set_input(y, 1)\nCompared to TFLite Python API where you set the input tensor using the input details index, in TFLite Micro Python API, you set the input tensor using the input index directly. The index range depends on how many inputs you have. The order between the data and the index was reversed as well.\nRun inference:\ninterpreter.invoke()\nGet output tensor:\noutput_data = interpreter.get_output(0)\nThe same as set input tensor, you can use the output index depending on how many outputs you have."
+  },
+  {
+    "objectID": "posts/2025-08-05-tfl-vs-tflm/index.html#difference-between-tflite-and-tflite-micro-output",
+    "href": "posts/2025-08-05-tfl-vs-tflm/index.html#difference-between-tflite-and-tflite-micro-output",
+    "title": "Difference between TFLite Python API vs TFLite Micro Python API",
+    "section": "Difference between TFLite and TFLite Micro Output",
+    "text": "Difference between TFLite and TFLite Micro Output\nI will use the yolov8n example from ultralytics to compare the difference between tflite and tflite-micro. They provide a script to inference yolov8 tflite model and visualize the result, makes it quite convenient. I make another class that subclass the YOLOv8TFLite example but using tflite-micro python package to do the inference.\nIf you are interested to follow the example you can refer my repo tflite_vs_tflite-micro.\n\nInference Speed\nCompared to TFLite python package, the TFLite Micro python package is much slower to run on PC. In this example, tflite python package only takes 0.04 second while tflite micro python package takes 76.7 second - 1917 times slower!!.\n\n\nInference Result\n\n\n \n\nIf you observe in detail, you could see that the bounding box of the bus is different and tflite predicts 0.34 confidence for the cut off person while tflite-micro predicts 0.39."
+  },
+  {
+    "objectID": "posts/2025-08-05-tfl-vs-tflm/index.html#conclusion",
+    "href": "posts/2025-08-05-tfl-vs-tflm/index.html#conclusion",
+    "title": "Difference between TFLite Python API vs TFLite Micro Python API",
+    "section": "Conclusion",
+    "text": "Conclusion\nFrom the example above, we could see that due to the implementation difference TFLite Python API and TFLite Micro Python produced different result. I have seen worse cases than where the tflite result and tflite-micro result diverge a lot this from my past experience. My suggestion is if you want to check or reproduce your embedded tflite-micro result with python script, tflite-micro python package is a better choice than tflite python package. But due to the slow inference speed of tflite-micro package, it’s not suitable for evaluation the whole evaluation dataset."
+  },
+  {
+    "objectID": "projects.html",
+    "href": "projects.html",
+    "title": "Nomad's Wonderland",
+    "section": "",
+    "text": "List of projects I worked with."
+  },
+  {
+    "objectID": "posts/welcome/index.html",
+    "href": "posts/welcome/index.html",
+    "title": "Welcome To My Blog",
+    "section": "",
+    "text": "This is the first post in a Quarto blog. Welcome!\n\nSince this post doesn’t specify an explicit image, the first image in the post will be used in the listing page of posts."
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "I am a machine learning enginer with focus on computer vision and effcient machine learning solutions on edge based in Sweden.\nI mainly work with image related tasks nowadays from image signal processing, object detection/tracking/segmentation, face recognition systems."
+  },
+  {
+    "objectID": "posts/100-days-of-polars/2026-01-17-day001-selectors.html",
+    "href": "posts/100-days-of-polars/2026-01-17-day001-selectors.html",
+    "title": "100 Days of Polars - Day 001: Polars Selectors",
+    "section": "",
+    "text": "Today we will explore what polars selectors are, and what we can do with them."
+  },
+  {
+    "objectID": "posts/100-days-of-polars/2026-01-17-day001-selectors.html#introduction",
+    "href": "posts/100-days-of-polars/2026-01-17-day001-selectors.html#introduction",
+    "title": "100 Days of Polars - Day 001: Polars Selectors",
+    "section": "",
+    "text": "Today we will explore what polars selectors are, and what we can do with them."
+  },
+  {
+    "objectID": "posts/100-days-of-polars/2026-01-17-day001-selectors.html#what-are-polars-selectors",
+    "href": "posts/100-days-of-polars/2026-01-17-day001-selectors.html#what-are-polars-selectors",
+    "title": "100 Days of Polars - Day 001: Polars Selectors",
+    "section": "What are Polars Selectors?",
+    "text": "What are Polars Selectors?\nSelectors in polars are tools that you can use to select columns based on their properties, data types or patterns. For example if you want to select all string/numeric columns in your data frames:\nimport polars as pl\nimport polars.selectors as cs\n\ndf = pl.DataFrame({\n    \"id\": [1, 2],\n    \"test_score\": [88, 92],\n    \"final_score\": [95, 89],\n    \"category\": [\"A\", \"B\"],\n    \"updated_at\": [None, None]\n})\n\n# select all string columns\ndf.select(cs.string())\n\n# select all numeric columns\ndf.select(cs.numeric())\nThere are mainly three types of selectors in polars, 1. type based - you select columns based on data type; 2. pattern based - select columns based on pattern matching; 3. set logic selectors - combing multiple selectors together.\nWe will look at them by category"
+  },
+  {
+    "objectID": "posts/100-days-of-polars/2026-01-17-day001-selectors.html#type-based-selectors",
+    "href": "posts/100-days-of-polars/2026-01-17-day001-selectors.html#type-based-selectors",
+    "title": "100 Days of Polars - Day 001: Polars Selectors",
+    "section": "Type Based Selectors",
+    "text": "Type Based Selectors\n\ncs.numeric()\n\n\ncs.string()\n\n\ncs.temporal()\nSelector targets columns with time-based data type.\nimport polars as pl\nimport polars.selectors as cs\nfrom datetime import datetime\n\ndf = pl.DataFrame({\n    \"id\": [1, 2],\n    \"transaction_date\": [datetime(2023, 5, 12), datetime(2023, 6, 15)],\n    \"upload_at\": [datetime(2023, 5, 13, 10, 0), datetime(2023, 6, 16, 11, 0)],\n    \"amount\": [100.0, 200.0]\n})\n\n# Use cs.temporal() to apply a date operation to all time columns\nresult = df.with_columns(\n    cs.temporal().dt.month_start()\n)\n\n\ncs.by_name()\n\nSelecting columns by name\n\nimport polars as pl\nimport polars.selectors as cs\n\ndf = pl.DataFrame({\n    \"id\": [1, 2],\n    \"test_score\": [88, 92],\n    \"final_score\": [95, 89],\n    \"category\": [\"A\", \"B\"],\n    \"updated_at\": [None, None]\n})\n\n# Select specific columns by exact name\ndf.select(cs.by_name(\"id\", \"category\"))\n\n\ncs.by_dtype()\n\nSelecting columns by data type"
+  },
+  {
+    "objectID": "posts/100-days-of-polars/2026-01-17-day001-selectors.html#pattern-based-selectors",
+    "href": "posts/100-days-of-polars/2026-01-17-day001-selectors.html#pattern-based-selectors",
+    "title": "100 Days of Polars - Day 001: Polars Selectors",
+    "section": "Pattern-based Selectors",
+    "text": "Pattern-based Selectors\n\ncs.contains()\ncs.contains(\"score\")\n\n\ncs.matches()\n\nAllow to use regex patterns\n\nimport polars as pl\nimport polars.selectors as cs\n\ndf = pl.DataFrame({\n    \"abc_123\": [1],\n    \"abc_456\": [2],\n    \"xyz_123\": [3],\n    \"id_primary\": [4],\n    \"id_secondary\": [5]\n})\n# Select columns that start with 3 letters, an underscore, and then numbers\n# Pattern: ^[a-z]{3}_\\d+$\nresult = df.select(\n    cs.matches(r\"^[a-z]{3}_\\d+$\")\n)\n\n\ncs.starts_with()\ncs.starts_with(\"sale_\")\n\n\ncs.ends_with()\ncs.ends_with(\"sum\")"
+  },
+  {
+    "objectID": "posts/100-days-of-polars/2026-01-17-day001-selectors.html#combining-selectors",
+    "href": "posts/100-days-of-polars/2026-01-17-day001-selectors.html#combining-selectors",
+    "title": "100 Days of Polars - Day 001: Polars Selectors",
+    "section": "Combining Selectors",
+    "text": "Combining Selectors\n\nSet Operations\n\nUnion (|)\n\ntarget_cols = cs.starts_with(\"sale_\") | cs.numeric()\n\ndf.select(target_cols)\n\nIntersection (&)\n\ntarget_cols = cs.starts_with(\"sale_\") & cs.numeric()\n\ndf.select(target_cols)\n\nDifference (-): used to exclude some columns\n\n# Logic: All Numerics MINUS the columns we want to protect\nfeatures = cs.numeric() - cs.by_name(\"user_id\", \"target_label\")\n\ndf.with_columns(\n    features.standardize()\n)\n\nComplement (~)\n\ndf.select(~cs.string())"
+  },
+  {
+    "objectID": "posts/100-days-of-polars/2026-01-17-day001-selectors.html#practical-use-cases",
+    "href": "posts/100-days-of-polars/2026-01-17-day001-selectors.html#practical-use-cases",
+    "title": "100 Days of Polars - Day 001: Polars Selectors",
+    "section": "Practical Use Cases",
+    "text": "Practical Use Cases\n\nExample 1: Data Cleaning\n\nSelecting all numeric columns for transformation\nCode example\n\n\n\nExample 2: Type-Based Operations\n\nApplying different operations to different column types\nCode example\n\n\n\nExample 3: Pattern Matching\n\nSelecting columns that match specific patterns\nCode example"
+  },
+  {
+    "objectID": "posts/100-days-of-polars/2026-01-17-day001-selectors.html#performance-considerations",
+    "href": "posts/100-days-of-polars/2026-01-17-day001-selectors.html#performance-considerations",
+    "title": "100 Days of Polars - Day 001: Polars Selectors",
+    "section": "Performance Considerations",
+    "text": "Performance Considerations\n\nWhy selectors are efficient\nComparison with other selection methods"
+  },
+  {
+    "objectID": "posts/100-days-of-polars/2026-01-17-day001-selectors.html#common-patterns-and-best-practices",
+    "href": "posts/100-days-of-polars/2026-01-17-day001-selectors.html#common-patterns-and-best-practices",
+    "title": "100 Days of Polars - Day 001: Polars Selectors",
+    "section": "Common Patterns and Best Practices",
+    "text": "Common Patterns and Best Practices\n\nWhen to use selectors vs traditional selection\nTips for readable and maintainable code\nCommon pitfalls to avoid"
+  },
+  {
+    "objectID": "posts/100-days-of-polars/2026-01-17-day001-selectors.html#next-steps",
+    "href": "posts/100-days-of-polars/2026-01-17-day001-selectors.html#next-steps",
+    "title": "100 Days of Polars - Day 001: Polars Selectors",
+    "section": "Next Steps",
+    "text": "Next Steps\n\nWhat’s coming in Day 002\nResources for further learning\nChallenge exercise for practice"
+  },
+  {
+    "objectID": "posts/100-days-of-polars/2026-01-17-day001-selectors.html#resources",
+    "href": "posts/100-days-of-polars/2026-01-17-day001-selectors.html#resources",
+    "title": "100 Days of Polars - Day 001: Polars Selectors",
+    "section": "Resources",
+    "text": "Resources\n\nPolars Documentation on Selectors"
+  },
+  {
+    "objectID": "posts/100-days-of-polars/2026-01-17-day001-selectors.html#conclusion",
+    "href": "posts/100-days-of-polars/2026-01-17-day001-selectors.html#conclusion",
+    "title": "100 Days of Polars - Day 001: Polars Selectors",
+    "section": "Conclusion",
+    "text": "Conclusion\nSummary of key takeaways and encouragement to practice using selectors."
+  },
+  {
+    "objectID": "posts/100-days-of-polars/2026-01-17-day001-selectors.html#practice-exercise",
+    "href": "posts/100-days-of-polars/2026-01-17-day001-selectors.html#practice-exercise",
+    "title": "100 Days of Polars - Day 001: Polars Selectors",
+    "section": "Practice Exercise",
+    "text": "Practice Exercise\nNow it’s time to practice! Try solving this exercise using selectors:\nScenario: You have a sales dataset with the following structure:\nimport polars as pl\nimport polars.selectors as cs\nfrom datetime import datetime\n\nsales_df = pl.DataFrame({\n    \"order_id\": [1001, 1002, 1003, 1004, 1005],\n    \"customer_id\": [501, 502, 503, 504, 505],\n    \"product_price\": [29.99, 149.99, 79.99, 199.99, 49.99],\n    \"shipping_cost\": [5.99, 12.99, 8.99, 15.99, 6.99],\n    \"tax_amount\": [2.40, 12.00, 6.40, 16.00, 4.00],\n    \"sale_region\": [\"North\", \"South\", \"East\", \"West\", \"North\"],\n    \"sale_channel\": [\"Online\", \"Store\", \"Online\", \"Store\", \"Online\"],\n    \"order_date\": [\n        datetime(2026, 1, 10),\n        datetime(2026, 1, 11),\n        datetime(2026, 1, 12),\n        datetime(2026, 1, 13),\n        datetime(2026, 1, 14)\n    ],\n    \"delivery_date\": [\n        datetime(2026, 1, 15),\n        datetime(2026, 1, 16),\n        datetime(2026, 1, 17),\n        datetime(2026, 1, 18),\n        datetime(2026, 1, 19)\n    ]\n})\nTasks:\n\nSelect all columns that contain the word “sale” in their name\nSelect all numeric columns EXCEPT the ID columns (order_id and customer_id)\nCalculate the sum of all columns that end with “_cost” or “_amount”\nExtract just the month from all temporal columns\nSelect all string columns that start with “sale_” and convert them to lowercase\n\nBonus Challenge: Create a single expression that selects all numeric columns (except IDs), rounds them to 2 decimal places, and adds a “_rounded” suffix to each column name.\n\n\nClick to see solutions\n\n# Task 1: Select columns containing \"sale\"\nsales_df.select(cs.contains(\"sale\"))\n\n# Task 2: Numeric columns excluding IDs\nsales_df.select(cs.numeric() - cs.by_name(\"order_id\", \"customer_id\"))\n\n# Task 3: Sum of cost and amount columns\nsales_df.select(\n    (cs.ends_with(\"_cost\") | cs.ends_with(\"_amount\")).sum()\n)\n\n# Task 4: Extract month from temporal columns\nsales_df.with_columns(\n    cs.temporal().dt.month()\n)\n\n# Task 5: Lowercase string columns starting with \"sale_\"\nsales_df.with_columns(\n    (cs.starts_with(\"sale_\") & cs.string()).str.to_lowercase()\n)\n\n# Bonus: Round numeric columns (except IDs) with suffix\nsales_df.with_columns(\n    (cs.numeric() - cs.by_name(\"order_id\", \"customer_id\"))\n    .round(2)\n    .name.suffix(\"_rounded\")\n)"
+  }
+]

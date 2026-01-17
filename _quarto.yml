@@ -1,0 +1,32 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "Nomad's Wonderland"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: projects.qmd
+        text: Projects
+      - href: cv.qmd
+        text: CV
+      - about.qmd
+      
+    right:
+      - icon: github
+        href: https://github.com/digital-nomad-cheng
+      - icon: linkedin
+        href: https://www.linkedin.com/in/yuhua-cheng-nomad/
+
+format:
+  html:
+    theme:
+      - cosmo
+      - brand
+    css: styles.css
+    toc: true
+
+
+
