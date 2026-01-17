@@ -1,0 +1,236 @@
+---
+title: "100 Days of Polars - Day 001: Polars Selectors"
+author: "NomadC"
+date: "2026-01-17"
+categories: [polars, data-engineering, 100-days-of-polars]
+description: "Polars selectors for efficient column selection"
+---
+
+## Introduction
+
+Today we will explore what polars selectors are, and what we can do with them.
+
+## What are Polars Selectors?
+
+Selectors in polars are tools that you can use to select columns based on their properties, data types or patterns.
+For example if you want to select all string/numeric columns in your data frames:
+```python
+import polars as pl
+import polars.selectors as cs
+
+df = pl.DataFrame({
+    "id": [1, 2],
+    "test_score": [88, 92],
+    "final_score": [95, 89],
+    "category": ["A", "B"],
+    "updated_at": [None, None]
+})
+
+# select all string columns
+df.select(cs.string())
+
+# select all numeric columns
+df.select(cs.numeric())
+```
+
+There are mainly three types of selectors in polars, 
+1. type based - you select columns based on data type;
+2. pattern based - select columns based on pattern matching;
+3. set logic selectors - combing multiple selectors together.
+
+We will look at them by category
+
+## Type Based Selectors
+### `cs.numeric()`
+### `cs.string()`
+### `cs.temporal()`
+Selector targets columns with time-based data type.
+```python
+import polars as pl
+import polars.selectors as cs
+from datetime import datetime
+
+df = pl.DataFrame({
+    "id": [1, 2],
+    "transaction_date": [datetime(2023, 5, 12), datetime(2023, 6, 15)],
+    "upload_at": [datetime(2023, 5, 13, 10, 0), datetime(2023, 6, 16, 11, 0)],
+    "amount": [100.0, 200.0]
+})
+
+# Use cs.temporal() to apply a date operation to all time columns
+result = df.with_columns(
+    cs.temporal().dt.month_start()
+)
+
+```
+### `cs.by_name()`
+- Selecting columns by name
+
+```python
+import polars as pl
+import polars.selectors as cs
+
+df = pl.DataFrame({
+    "id": [1, 2],
+    "test_score": [88, 92],
+    "final_score": [95, 89],
+    "category": ["A", "B"],
+    "updated_at": [None, None]
+})
+
+# Select specific columns by exact name
+df.select(cs.by_name("id", "category"))
+
+```
+### `cs.by_dtype()`
+- Selecting columns by data type
+
+## Pattern-based Selectors
+
+### `cs.contains()`
+
+```python
+cs.contains("score")
+```
+
+### `cs.matches()`
+- Allow to use regex patterns
+```python
+import polars as pl
+import polars.selectors as cs
+
+df = pl.DataFrame({
+    "abc_123": [1],
+    "abc_456": [2],
+    "xyz_123": [3],
+    "id_primary": [4],
+    "id_secondary": [5]
+})
+# Select columns that start with 3 letters, an underscore, and then numbers
+# Pattern: ^[a-z]{3}_\d+$
+result = df.select(
+    cs.matches(r"^[a-z]{3}_\d+$")
+)
+```
+### `cs.starts_with()`
+```python
+cs.starts_with("sale_")
+```
+### `cs.ends_with()`
+```python
+cs.ends_with("sum")
+```
+## Combining Selectors
+
+### Set Operations
+- Union (`|`)
+```python
+target_cols = cs.starts_with("sale_") | cs.numeric()
+
+df.select(target_cols)
+```
+- Intersection (`&`)
+```python
+target_cols = cs.starts_with("sale_") & cs.numeric()
+
+df.select(target_cols)
+```
+- Difference (`-`): used to exclude some columns
+```python
+# Logic: All Numerics MINUS the columns we want to protect
+features = cs.numeric() - cs.by_name("user_id", "target_label")
+
+df.with_columns(
+    features.standardize()
+)
+```
+- Complement (`~`)
+```python
+df.select(~cs.string())
+```
+
+## Practice Exercise
+
+Now it's time to practice! Try solving this exercise using selectors:
+
+**Scenario**: You have a sales dataset with the following structure:
+
+```python
+import polars as pl
+import polars.selectors as cs
+from datetime import datetime
+
+sales_df = pl.DataFrame({
+    "order_id": [1001, 1002, 1003, 1004, 1005],
+    "customer_id": [501, 502, 503, 504, 505],
+    "product_price": [29.99, 149.99, 79.99, 199.99, 49.99],
+    "shipping_cost": [5.99, 12.99, 8.99, 15.99, 6.99],
+    "tax_amount": [2.40, 12.00, 6.40, 16.00, 4.00],
+    "sale_region": ["North", "South", "East", "West", "North"],
+    "sale_channel": ["Online", "Store", "Online", "Store", "Online"],
+    "order_date": [
+        datetime(2026, 1, 10),
+        datetime(2026, 1, 11),
+        datetime(2026, 1, 12),
+        datetime(2026, 1, 13),
+        datetime(2026, 1, 14)
+    ],
+    "delivery_date": [
+        datetime(2026, 1, 15),
+        datetime(2026, 1, 16),
+        datetime(2026, 1, 17),
+        datetime(2026, 1, 18),
+        datetime(2026, 1, 19)
+    ]
+})
+```
+
+**Tasks**:
+
+1. Select all columns that contain the word "sale" in their name
+2. Select all numeric columns EXCEPT the ID columns (`order_id` and `customer_id`)
+3. Calculate the sum of all columns that end with "_cost" or "_amount"
+4. Extract just the month from all temporal columns
+5. Select all string columns that start with "sale_" and convert them to lowercase
+
+**Bonus Challenge**: 
+Create a single expression that selects all numeric columns (except IDs), rounds them to 2 decimal places, and adds a "_rounded" suffix to each column name.
+
+<details>
+<summary>Click to see solutions</summary>
+
+```python
+# Task 1: Select columns containing "sale"
+sales_df.select(cs.contains("sale"))
+
+# Task 2: Numeric columns excluding IDs
+sales_df.select(cs.numeric() - cs.by_name("order_id", "customer_id"))
+
+# Task 3: Sum of cost and amount columns
+sales_df.select(
+    (cs.ends_with("_cost") | cs.ends_with("_amount")).sum()
+)
+
+# Task 4: Extract month from temporal columns
+sales_df.with_columns(
+    cs.temporal().dt.month()
+)
+
+# Task 5: Lowercase string columns starting with "sale_"
+sales_df.with_columns(
+    (cs.starts_with("sale_") & cs.string()).str.to_lowercase()
+)
+
+# Bonus: Round numeric columns (except IDs) with suffix
+sales_df.with_columns(
+    (cs.numeric() - cs.by_name("order_id", "customer_id"))
+    .round(2)
+    .name.suffix("_rounded")
+)
+```
+
+</details>
+
+## Resources
+
+- [Polars Documentation on Selectors](https://docs.pola.rs/py-polars/html/reference/selectors.html)

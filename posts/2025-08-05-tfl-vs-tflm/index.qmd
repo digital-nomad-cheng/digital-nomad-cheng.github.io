@@ -1,6 +1,4 @@
 ---
-filters:
-    - marimo-team/marimo
 title: "Difference between TFLite Python API vs TFLite Micro Python API"
 author: "NomadC"
 date: "2025-08-05"
