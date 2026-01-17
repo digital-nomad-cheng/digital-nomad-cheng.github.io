@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/100-days-of-polars/2026-01-17-day001-selectors.html",
       "/posts/2025-08-05-tfl-vs-tflm/index.html",
       "/posts/welcome/index.html"
     ]
