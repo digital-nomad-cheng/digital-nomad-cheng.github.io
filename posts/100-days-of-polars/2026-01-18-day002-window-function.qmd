@@ -1,0 +1,148 @@
+---
+title: "100 Days of Polars - Day 002: Window Functions"
+author: "NomadC"
+date: "2026-01-18"
+categories: [polars, data-engineering, 100-days-of-polars]
+description: "Master window functions in Polars for advanced data transformations"
+---
+
+## Introduction: What Are Window Functions?
+
+Window functions are one of the most powerful features in Polars for performing calculations across rows in a group. Unlike aggregations `group_by` that collapse rows into single values, window functions maintain all rows while computing values based on a "window" of data.
+
+Window function allows you to:
+
+- Calculate running totals and moving averages
+- Rank rows within groups
+- Compare values with group averages
+- Perform time-based calculations
+
+Window function can be used through `.over()` in polars.
+You can achive the result as window function with `group_by` and `join` in polars.
+
+```python
+import polars as pl
+from polars import window_function as wf
+
+df = pl.DataFrame({
+    "department": ["Sales", "Sales", "Sales", "Engineering", "Engineering", "Engineering"],
+    "employee": ["Alice", "Bob", "Carol", "David", "Eve", "Frank"],
+    "salary": [50000, 60000, 55000, 75000, 80000, 72000]
+})
+
+# Add a column showing each employee's salary compared to their department's average.
+df.with_columns(
+    dept_avg_salary=pl.col("salary").mean().over("department")
+)
+
+# Equivalent with group_by and join
+dept_avg = df.group_by("department").agg(
+    pl.col("salary").mean().alias("dept_avg_salary")
+)
+df.join(dept_avg, on="department")
+```
+
+
+
+## Common Window Functions
+
+### Aggregations
+
+All standard aggregation functions work as window functions, aggregation functions must come before window functions `.over`:
+
+```python
+df.with_columns(
+    dept_salary_sum=pl.col("salary").sum().over("department"),
+    dept_salary_min=pl.col("salary").min().over("department"),
+    dept_salary_max=pl.col("salary").max().over("department"),
+    dept_salary_count=pl.col("salary").count().over("department")
+)
+```
+
+### Cumulative Sums
+
+```python
+df.sort("salary").with_columns(
+    running_total=pl.col("salary").cum_sum().over("department")
+)
+```
+
+### Ranking 
+
+```python
+df.with_columns(
+    salary_rank=pl.col("salary").rank().over("department")
+)
+```
+
+Available ranking methods:
+- `"ordinal"` - sequential integers (1, 2, 3...)
+- `"dense"` - dense ranking without gaps
+- `"min"`, `"max"`, `"avg"` - various average ranking methods
+
+
+### First and Last Values
+
+```python
+df.sort("salary").with_columns(
+    lowest_in_dept=pl.col("salary").first().over("department"),
+    highest_in_dept=pl.col("salary").last().over("department")
+)
+```
+
+
+## Practice Exercise
+
+**Scenario**: You have a sales dataset with regional sales data:
+
+```python
+import polars as pl
+from datetime import datetime
+
+sales_df = pl.DataFrame({
+    "region": ["North", "North", "North", "South", "South", "South", "East", "East"],
+    "salesperson": ["Alice", "Bob", "Carol", "David", "Eve", "Frank", "Grace", "Henry"],
+    "quarter": ["Q1", "Q1", "Q2", "Q1", "Q2", "Q2", "Q1", "Q2"],
+    "sales": [10000, 15000, 12000, 20000, 18000, 22000, 14000, 16000]
+})
+```
+
+**Tasks**:
+
+1. Calculate each salesperson's sales as a percentage of their region's total
+2. Rank salespeople within each region by sales amount
+3. Calculate running total of sales within each region (sorted by sales amount)
+4. Find the top performer in each region and quarter
+
+<details>
+<summary>Click to see solutions</summary>
+
+```python
+# Task 1: Percentage of regional total
+sales_df.with_columns(
+    region_total=pl.col("sales").sum().over("region"),
+    pct_of_region=(pl.col("sales") / pl.col("region_total")) * 100
+).drop("region_total")
+
+# Task 2: Rank within region
+sales_df.with_columns(
+    rank_in_region=pl.col("sales").rank("ordinal", descending=True).over("region")
+)
+
+# Task 3: Running total within region
+sales_df.sort("sales", descending=True).with_columns(
+    running_total=pl.col("sales").cum_sum().over("region")
+)
+
+# Task 4: Top performer in each region and quarter
+sales_df.with_columns(
+    max_sales=pl.col("sales").max().over("region", "quarter")
+).filter(pl.col("sales") == pl.col("max_sales")).drop("max_sales")
+```
+
+</details>
+
+## Resources
+
+- [Polars Documentation on Window Functions](https://docs.pola.rs/py-polars/html/reference/expressions/window.html)
+- [Polars Window Function API](https://docs.pola.rs/api/python/stable/reference/expressions/api/polars.Expr.over.html)
