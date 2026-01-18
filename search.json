@@ -35,55 +35,6 @@
     "text": "Skills\n\nSpecilization: Digital Image Processing, Computer Vision, Object Detection, Object Segmentation, Edge Computing, Efficient ML\nTools: PyTorch/Keras/TensorFlow, TFLite/Micro\nProgramming Languages: Python/C++"
   },
   {
-    "objectID": "posts/welcome/index.html",
-    "href": "posts/welcome/index.html",
-    "title": "Welcome To My Blog",
-    "section": "",
-    "text": "This is the first post in a Quarto blog. Welcome!\n\nSince this post doesn’t specify an explicit image, the first image in the post will be used in the listing page of posts."
-  },
-  {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
-    "section": "",
-    "text": "I am a machine learning enginer with focus on computer vision and effcient machine learning solutions on edge based in Sweden.\nI mainly work with image related tasks nowadays from image signal processing, object detection/tracking/segmentation, face recognition systems."
-  },
-  {
-    "objectID": "posts/2025-08-05-tfl-vs-tflm/index.html",
-    "href": "posts/2025-08-05-tfl-vs-tflm/index.html",
-    "title": "Difference between TFLite Python API vs TFLite Micro Python API",
-    "section": "",
-    "text": "TFLite Micro is the most popular Neural Network inference engine for micro CPUs. It’s designed for light weight model running on low power hardwares.\nMost common scenario is you use some training framework like PyTorch and TensorFlow, quantize it to tflite model. Finally you run your model on embedded device through the TFLite Micro library. However, the precision of the model usually loses during the quantization process. People would like to use the TFLite Python API to run the model on their computer, and verify the accuracy of the model is reduced to an acceptable level before deploying it to the embedded device. The problem is that the TFLite Python API cannot really simulate the model’s precision when running on the embedded device with TFLite Micro library. There are already lots of discussions about this issue, see github discussions 1 and 2\nUnknown to many people, TFLite Micro has a Python API, but the TFLite Micro Python API is different from the TFLite Python API. The TFLite Micro Python API is designed to run on the same principles as the TFLite Micro C++ library, which means it can provide a more accurate simulation of how the model will perform on embedded devices.\nIn this blog I will compare the TFLite Python API and the TFLite Micro Python API differences, and show how the two different APIs can be used to run the same model but have different results."
-  },
-  {
-    "objectID": "posts/2025-08-05-tfl-vs-tflm/index.html#tflite-python-api",
-    "href": "posts/2025-08-05-tfl-vs-tflm/index.html#tflite-python-api",
-    "title": "Difference between TFLite Python API vs TFLite Micro Python API",
-    "section": "TFLite Python API",
-    "text": "TFLite Python API\nThe TFLite was previously decoupled from TensorFlow and was a standalone library called LiteRT now.\n\nLoading model:\nfrom ai-edge-litert.interpreter import Interpreter\ninterpreter = Interpreter(model_path=model)\nAllocate tensors:\ninterpreter.allocate_tensors()\nIt performs dynamic memory allocation for: a. allocates memory buffers for model inputs and outputs, b. allocates memory for all intermediate computation results between layers, c. allocates workspace memory needed during inference, d. finalizes the computation graph and prepares it for execution.\nGet input and output tensors details:\ninput_details = interpreter.get_input_details()\noutput_details = interpreter.get_output_details()\nSet input tensor:\ninterpreter.set_tensor(input_details[0]['index'], x)\nRun inference:\ninterpreter.invoke()\nGet output tensor:\noutput_data = interpreter.get_tensor(output_details[0]['index'])"
-  },
-  {
-    "objectID": "posts/2025-08-05-tfl-vs-tflm/index.html#tflite-micro-python-api",
-    "href": "posts/2025-08-05-tfl-vs-tflm/index.html#tflite-micro-python-api",
-    "title": "Difference between TFLite Python API vs TFLite Micro Python API",
-    "section": "TFLite Micro Python API",
-    "text": "TFLite Micro Python API\nThe TFLite Micro Python API is designed to run on the same principles as the TFLite Micro C++ library, it’s more aligned with the C++ API.\n\nLoading model, there are two ways to load the model file, one is from file, another is from bytearray.\nfrom tflite_micro.python.tflite_micro import runtime\n# Load from file\ninterpreter = runtime.Interpreter.from_file(model_path=model)\n# Load from bytearray\ninterpreter = runtime.Interpreter.from_bytes(model=model_bytes)\nThere is no need to allocate tensors. TFLite Micro pre-allocates all memory at compile time or initialization using a fixed-size arena. Embedded systems often lack heap allocation or have strict memory constraints, so TFLite Micro avoids malloc/free entirely.\nGet input and output tensors details:\ninput_details = interpreter.get_input_details(index)\noutput_details = interpreter.get_output_details(index)\nCompare to TFLite Python API where you can get all input and output details through one function call. In TFLite Micro Python API, you need to specify the index of the input or output tensor to get its details. For example, if you have multiple inputs or outputs, you can get the details of each one by specifying its index:\ninput_details = interpreter.get_input_details(0)  # Get details of first input tensor\noutput_details = interpreter.get_output_details(1)  # Get details of second output tensor\nSet input tensor:\n# Set input tensor using the input index\ninterpreter.set_input(x, 0)\n# If you have second input tensor:\ninterpreter.set_input(y, 1)\nCompared to TFLite Python API where you set the input tensor using the input details index, in TFLite Micro Python API, you set the input tensor using the input index directly. The index range depends on how many inputs you have. The order between the data and the index was reversed as well.\nRun inference:\ninterpreter.invoke()\nGet output tensor:\noutput_data = interpreter.get_output(0)\nThe same as set input tensor, you can use the output index depending on how many outputs you have."
-  },
-  {
-    "objectID": "posts/2025-08-05-tfl-vs-tflm/index.html#difference-between-tflite-and-tflite-micro-output",
-    "href": "posts/2025-08-05-tfl-vs-tflm/index.html#difference-between-tflite-and-tflite-micro-output",
-    "title": "Difference between TFLite Python API vs TFLite Micro Python API",
-    "section": "Difference between TFLite and TFLite Micro Output",
-    "text": "Difference between TFLite and TFLite Micro Output\nI will use the yolov8n example from ultralytics to compare the difference between tflite and tflite-micro. They provide a script to inference yolov8 tflite model and visualize the result, makes it quite convenient. I make another class that subclass the YOLOv8TFLite example but using tflite-micro python package to do the inference.\nIf you are interested to follow the example you can refer my repo tflite_vs_tflite-micro.\n\nInference Speed\nCompared to TFLite python package, the TFLite Micro python package is much slower to run on PC. In this example, tflite python package only takes 0.04 second while tflite micro python package takes 76.7 second - 1917 times slower!!.\n\n\nInference Result\n\n\n \n\nIf you observe in detail, you could see that the bounding box of the bus is different and tflite predicts 0.34 confidence for the cut off person while tflite-micro predicts 0.39."
-  },
-  {
-    "objectID": "posts/2025-08-05-tfl-vs-tflm/index.html#conclusion",
-    "href": "posts/2025-08-05-tfl-vs-tflm/index.html#conclusion",
-    "title": "Difference between TFLite Python API vs TFLite Micro Python API",
-    "section": "Conclusion",
-    "text": "Conclusion\nFrom the example above, we could see that due to the implementation difference TFLite Python API and TFLite Micro Python produced different result. I have seen worse cases than where the tflite result and tflite-micro result diverge a lot this from my past experience. My suggestion is if you want to check or reproduce your embedded tflite-micro result with python script, tflite-micro python package is a better choice than tflite python package. But due to the slow inference speed of tflite-micro package, it’s not suitable for evaluation the whole evaluation dataset."
-  },
-  {
     "objectID": "posts/100-days-of-polars/2026-01-17-day001-selectors.html",
     "href": "posts/100-days-of-polars/2026-01-17-day001-selectors.html",
     "title": "100 Days of Polars - Day 001: Polars Selectors",
@@ -140,10 +91,94 @@
     "text": "Resources\n\nPolars Documentation on Selectors"
   },
   {
+    "objectID": "posts/2025-08-05-tfl-vs-tflm/index.html",
+    "href": "posts/2025-08-05-tfl-vs-tflm/index.html",
+    "title": "Difference between TFLite Python API vs TFLite Micro Python API",
+    "section": "",
+    "text": "TFLite Micro is the most popular Neural Network inference engine for micro CPUs. It’s designed for light weight model running on low power hardwares.\nMost common scenario is you use some training framework like PyTorch and TensorFlow, quantize it to tflite model. Finally you run your model on embedded device through the TFLite Micro library. However, the precision of the model usually loses during the quantization process. People would like to use the TFLite Python API to run the model on their computer, and verify the accuracy of the model is reduced to an acceptable level before deploying it to the embedded device. The problem is that the TFLite Python API cannot really simulate the model’s precision when running on the embedded device with TFLite Micro library. There are already lots of discussions about this issue, see github discussions 1 and 2\nUnknown to many people, TFLite Micro has a Python API, but the TFLite Micro Python API is different from the TFLite Python API. The TFLite Micro Python API is designed to run on the same principles as the TFLite Micro C++ library, which means it can provide a more accurate simulation of how the model will perform on embedded devices.\nIn this blog I will compare the TFLite Python API and the TFLite Micro Python API differences, and show how the two different APIs can be used to run the same model but have different results."
+  },
+  {
+    "objectID": "posts/2025-08-05-tfl-vs-tflm/index.html#tflite-python-api",
+    "href": "posts/2025-08-05-tfl-vs-tflm/index.html#tflite-python-api",
+    "title": "Difference between TFLite Python API vs TFLite Micro Python API",
+    "section": "TFLite Python API",
+    "text": "TFLite Python API\nThe TFLite was previously decoupled from TensorFlow and was a standalone library called LiteRT now.\n\nLoading model:\nfrom ai-edge-litert.interpreter import Interpreter\ninterpreter = Interpreter(model_path=model)\nAllocate tensors:\ninterpreter.allocate_tensors()\nIt performs dynamic memory allocation for: a. allocates memory buffers for model inputs and outputs, b. allocates memory for all intermediate computation results between layers, c. allocates workspace memory needed during inference, d. finalizes the computation graph and prepares it for execution.\nGet input and output tensors details:\ninput_details = interpreter.get_input_details()\noutput_details = interpreter.get_output_details()\nSet input tensor:\ninterpreter.set_tensor(input_details[0]['index'], x)\nRun inference:\ninterpreter.invoke()\nGet output tensor:\noutput_data = interpreter.get_tensor(output_details[0]['index'])"
+  },
+  {
+    "objectID": "posts/2025-08-05-tfl-vs-tflm/index.html#tflite-micro-python-api",
+    "href": "posts/2025-08-05-tfl-vs-tflm/index.html#tflite-micro-python-api",
+    "title": "Difference between TFLite Python API vs TFLite Micro Python API",
+    "section": "TFLite Micro Python API",
+    "text": "TFLite Micro Python API\nThe TFLite Micro Python API is designed to run on the same principles as the TFLite Micro C++ library, it’s more aligned with the C++ API.\n\nLoading model, there are two ways to load the model file, one is from file, another is from bytearray.\nfrom tflite_micro.python.tflite_micro import runtime\n# Load from file\ninterpreter = runtime.Interpreter.from_file(model_path=model)\n# Load from bytearray\ninterpreter = runtime.Interpreter.from_bytes(model=model_bytes)\nThere is no need to allocate tensors. TFLite Micro pre-allocates all memory at compile time or initialization using a fixed-size arena. Embedded systems often lack heap allocation or have strict memory constraints, so TFLite Micro avoids malloc/free entirely.\nGet input and output tensors details:\ninput_details = interpreter.get_input_details(index)\noutput_details = interpreter.get_output_details(index)\nCompare to TFLite Python API where you can get all input and output details through one function call. In TFLite Micro Python API, you need to specify the index of the input or output tensor to get its details. For example, if you have multiple inputs or outputs, you can get the details of each one by specifying its index:\ninput_details = interpreter.get_input_details(0)  # Get details of first input tensor\noutput_details = interpreter.get_output_details(1)  # Get details of second output tensor\nSet input tensor:\n# Set input tensor using the input index\ninterpreter.set_input(x, 0)\n# If you have second input tensor:\ninterpreter.set_input(y, 1)\nCompared to TFLite Python API where you set the input tensor using the input details index, in TFLite Micro Python API, you set the input tensor using the input index directly. The index range depends on how many inputs you have. The order between the data and the index was reversed as well.\nRun inference:\ninterpreter.invoke()\nGet output tensor:\noutput_data = interpreter.get_output(0)\nThe same as set input tensor, you can use the output index depending on how many outputs you have."
+  },
+  {
+    "objectID": "posts/2025-08-05-tfl-vs-tflm/index.html#difference-between-tflite-and-tflite-micro-output",
+    "href": "posts/2025-08-05-tfl-vs-tflm/index.html#difference-between-tflite-and-tflite-micro-output",
+    "title": "Difference between TFLite Python API vs TFLite Micro Python API",
+    "section": "Difference between TFLite and TFLite Micro Output",
+    "text": "Difference between TFLite and TFLite Micro Output\nI will use the yolov8n example from ultralytics to compare the difference between tflite and tflite-micro. They provide a script to inference yolov8 tflite model and visualize the result, makes it quite convenient. I make another class that subclass the YOLOv8TFLite example but using tflite-micro python package to do the inference.\nIf you are interested to follow the example you can refer my repo tflite_vs_tflite-micro.\n\nInference Speed\nCompared to TFLite python package, the TFLite Micro python package is much slower to run on PC. In this example, tflite python package only takes 0.04 second while tflite micro python package takes 76.7 second - 1917 times slower!!.\n\n\nInference Result\n\n\n \n\nIf you observe in detail, you could see that the bounding box of the bus is different and tflite predicts 0.34 confidence for the cut off person while tflite-micro predicts 0.39."
+  },
+  {
+    "objectID": "posts/2025-08-05-tfl-vs-tflm/index.html#conclusion",
+    "href": "posts/2025-08-05-tfl-vs-tflm/index.html#conclusion",
+    "title": "Difference between TFLite Python API vs TFLite Micro Python API",
+    "section": "Conclusion",
+    "text": "Conclusion\nFrom the example above, we could see that due to the implementation difference TFLite Python API and TFLite Micro Python produced different result. I have seen worse cases than where the tflite result and tflite-micro result diverge a lot this from my past experience. My suggestion is if you want to check or reproduce your embedded tflite-micro result with python script, tflite-micro python package is a better choice than tflite python package. But due to the slow inference speed of tflite-micro package, it’s not suitable for evaluation the whole evaluation dataset."
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "I am a machine learning enginer with focus on computer vision and effcient machine learning solutions on edge based in Sweden.\nI mainly work with image related tasks nowadays from image signal processing, object detection/tracking/segmentation, face recognition systems."
+  },
+  {
+    "objectID": "posts/welcome/index.html",
+    "href": "posts/welcome/index.html",
+    "title": "Welcome To My Blog",
+    "section": "",
+    "text": "This is the first post in a Quarto blog. Welcome!\n\nSince this post doesn’t specify an explicit image, the first image in the post will be used in the listing page of posts."
+  },
+  {
+    "objectID": "posts/100-days-of-polars/2026-01-18-day002-window-function.html",
+    "href": "posts/100-days-of-polars/2026-01-18-day002-window-function.html",
+    "title": "100 Days of Polars - Day 002: Window Functions",
+    "section": "",
+    "text": "Window functions are one of the most powerful features in Polars for performing calculations across rows in a group. Unlike aggregations group_by that collapse rows into single values, window functions maintain all rows while computing values based on a “window” of data.\nWindow function allows you to:\n\nCalculate running totals and moving averages\nRank rows within groups\nCompare values with group averages\nPerform time-based calculations\n\nWindow function can be used through .over() in polars. You can achive the result as window function with group_by and join in polars.\nimport polars as pl\nfrom polars import window_function as wf\n\ndf = pl.DataFrame({\n    \"department\": [\"Sales\", \"Sales\", \"Sales\", \"Engineering\", \"Engineering\", \"Engineering\"],\n    \"employee\": [\"Alice\", \"Bob\", \"Carol\", \"David\", \"Eve\", \"Frank\"],\n    \"salary\": [50000, 60000, 55000, 75000, 80000, 72000]\n})\n\n# Add a column showing each employee's salary compared to their department's average.\ndf.with_columns(\n    dept_avg_salary=pl.col(\"salary\").mean().over(\"department\")\n)\n\n# Equivalent with group_by and join\ndept_avg = df.group_by(\"department\").agg(\n    pl.col(\"salary\").mean().alias(\"dept_avg_salary\")\n)\ndf.join(dept_avg, on=\"department\")"
+  },
+  {
+    "objectID": "posts/100-days-of-polars/2026-01-18-day002-window-function.html#introduction-what-are-window-functions",
+    "href": "posts/100-days-of-polars/2026-01-18-day002-window-function.html#introduction-what-are-window-functions",
+    "title": "100 Days of Polars - Day 002: Window Functions",
+    "section": "",
+    "text": "Window functions are one of the most powerful features in Polars for performing calculations across rows in a group. Unlike aggregations group_by that collapse rows into single values, window functions maintain all rows while computing values based on a “window” of data.\nWindow function allows you to:\n\nCalculate running totals and moving averages\nRank rows within groups\nCompare values with group averages\nPerform time-based calculations\n\nWindow function can be used through .over() in polars. You can achive the result as window function with group_by and join in polars.\nimport polars as pl\nfrom polars import window_function as wf\n\ndf = pl.DataFrame({\n    \"department\": [\"Sales\", \"Sales\", \"Sales\", \"Engineering\", \"Engineering\", \"Engineering\"],\n    \"employee\": [\"Alice\", \"Bob\", \"Carol\", \"David\", \"Eve\", \"Frank\"],\n    \"salary\": [50000, 60000, 55000, 75000, 80000, 72000]\n})\n\n# Add a column showing each employee's salary compared to their department's average.\ndf.with_columns(\n    dept_avg_salary=pl.col(\"salary\").mean().over(\"department\")\n)\n\n# Equivalent with group_by and join\ndept_avg = df.group_by(\"department\").agg(\n    pl.col(\"salary\").mean().alias(\"dept_avg_salary\")\n)\ndf.join(dept_avg, on=\"department\")"
+  },
+  {
+    "objectID": "posts/100-days-of-polars/2026-01-18-day002-window-function.html#common-window-functions",
+    "href": "posts/100-days-of-polars/2026-01-18-day002-window-function.html#common-window-functions",
+    "title": "100 Days of Polars - Day 002: Window Functions",
+    "section": "Common Window Functions",
+    "text": "Common Window Functions\n\nAggregations\nAll standard aggregation functions work as window functions, aggregation functions must come before window functions .over:\ndf.with_columns(\n    dept_salary_sum=pl.col(\"salary\").sum().over(\"department\"),\n    dept_salary_min=pl.col(\"salary\").min().over(\"department\"),\n    dept_salary_max=pl.col(\"salary\").max().over(\"department\"),\n    dept_salary_count=pl.col(\"salary\").count().over(\"department\")\n)\n\n\nCumulative Sums\ndf.sort(\"salary\").with_columns(\n    running_total=pl.col(\"salary\").cum_sum().over(\"department\")\n)\n\n\nRanking\ndf.with_columns(\n    salary_rank=pl.col(\"salary\").rank().over(\"department\")\n)\nAvailable ranking methods: - \"ordinal\" - sequential integers (1, 2, 3…) - \"dense\" - dense ranking without gaps - \"min\", \"max\", \"avg\" - various average ranking methods\n\n\nFirst and Last Values\ndf.sort(\"salary\").with_columns(\n    lowest_in_dept=pl.col(\"salary\").first().over(\"department\"),\n    highest_in_dept=pl.col(\"salary\").last().over(\"department\")\n)"
+  },
+  {
+    "objectID": "posts/100-days-of-polars/2026-01-18-day002-window-function.html#practice-exercise",
+    "href": "posts/100-days-of-polars/2026-01-18-day002-window-function.html#practice-exercise",
+    "title": "100 Days of Polars - Day 002: Window Functions",
+    "section": "Practice Exercise",
+    "text": "Practice Exercise\nScenario: You have a sales dataset with regional sales data:\nimport polars as pl\nfrom datetime import datetime\n\nsales_df = pl.DataFrame({\n    \"region\": [\"North\", \"North\", \"North\", \"South\", \"South\", \"South\", \"East\", \"East\"],\n    \"salesperson\": [\"Alice\", \"Bob\", \"Carol\", \"David\", \"Eve\", \"Frank\", \"Grace\", \"Henry\"],\n    \"quarter\": [\"Q1\", \"Q1\", \"Q2\", \"Q1\", \"Q2\", \"Q2\", \"Q1\", \"Q2\"],\n    \"sales\": [10000, 15000, 12000, 20000, 18000, 22000, 14000, 16000]\n})\nTasks:\n\nCalculate each salesperson’s sales as a percentage of their region’s total\nRank salespeople within each region by sales amount\nCalculate running total of sales within each region (sorted by sales amount)\nFind the top performer in each region and quarter\n\n\n\nClick to see solutions\n\n# Task 1: Percentage of regional total\nsales_df.with_columns(\n    region_total=pl.col(\"sales\").sum().over(\"region\"),\n    pct_of_region=(pl.col(\"sales\") / pl.col(\"region_total\")) * 100\n).drop(\"region_total\")\n\n# Task 2: Rank within region\nsales_df.with_columns(\n    rank_in_region=pl.col(\"sales\").rank(\"ordinal\", descending=True).over(\"region\")\n)\n\n# Task 3: Running total within region\nsales_df.sort(\"sales\", descending=True).with_columns(\n    running_total=pl.col(\"sales\").cum_sum().over(\"region\")\n)\n\n# Task 4: Top performer in each region and quarter\nsales_df.with_columns(\n    max_sales=pl.col(\"sales\").max().over(\"region\", \"quarter\")\n).filter(pl.col(\"sales\") == pl.col(\"max_sales\")).drop(\"max_sales\")"
+  },
+  {
+    "objectID": "posts/100-days-of-polars/2026-01-18-day002-window-function.html#resources",
+    "href": "posts/100-days-of-polars/2026-01-18-day002-window-function.html#resources",
+    "title": "100 Days of Polars - Day 002: Window Functions",
+    "section": "Resources",
+    "text": "Resources\n\nPolars Documentation on Window Functions\nPolars Window Function API"
+  },
+  {
     "objectID": "index.html",
     "href": "index.html",
     "title": "Blogs",
     "section": "",
-    "text": "100 Days of Polars - Day 001: Polars Selectors\n\n\n\n\n\n\npolars\n\n\ndata-engineering\n\n\n100-days-of-polars\n\n\n\nPolars selectors for efficient column selection\n\n\n\n\n\nJan 17, 2026\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\nDifference between TFLite Python API vs TFLite Micro Python API\n\n\n\n\n\n\ntflite\n\n\ntflite-micro\n\n\ncode\n\n\ntinyml\n\n\n\n\n\n\n\n\n\nAug 5, 2025\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\n\n\n\nnews\n\n\n\n\n\n\n\n\n\nAug 2, 2025\n\n\nTristan O’Malley\n\n\n\n\n\n\nNo matching items"
+    "text": "100 Days of Polars - Day 002: Window Functions\n\n\n\n\n\n\npolars\n\n\ndata-engineering\n\n\n100-days-of-polars\n\n\n\nMaster window functions in Polars for advanced data transformations\n\n\n\n\n\nJan 18, 2026\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\n100 Days of Polars - Day 001: Polars Selectors\n\n\n\n\n\n\npolars\n\n\ndata-engineering\n\n\n100-days-of-polars\n\n\n\nPolars selectors for efficient column selection\n\n\n\n\n\nJan 17, 2026\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\nDifference between TFLite Python API vs TFLite Micro Python API\n\n\n\n\n\n\ntflite\n\n\ntflite-micro\n\n\ncode\n\n\ntinyml\n\n\n\n\n\n\n\n\n\nAug 5, 2025\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\n\n\n\nnews\n\n\n\n\n\n\n\n\n\nAug 2, 2025\n\n\nTristan O’Malley\n\n\n\n\n\n\nNo matching items"
   }
 ]
