@@ -1,0 +1,138 @@
+---
+title: "100 Days of Polars - Day 003: map_elements vs map_batches vs Native Expressions"
+author: "NomadC"
+date: "2026-01-19"
+categories: [polars, data-engineering, 100-days-of-polars]
+description: "Understanding when to use map_elements, map_batches, and native Polars expressions"
+---
+
+## Introduction
+
+Today we'll explore how to apply custom logic in polars with `map_elements` when the functionality isn't available through polars's built-in expression.
+
+```python
+import random
+import string
+import time
+import polars as pl
+
+def random_string(length=8):
+    return ''.join(random.choices(string.ascii_lowercase, k=length))
+
+df = pl.DataFrame({
+    "text": [random_string() for _ in range(1_000_000)]
+})
+
+# Apply a custom function to each element
+t0 = time.time()
+result = df.with_columns(
+    pl.col("text").map_elements(lambda x: x.upper()).alias("uppercase")
+)
+t1 = time.time()
+print(f"map_elements: {t1-t0}")
+```
+When you run this code in polars you will get a warning like this:
+```
+<ipython-input-51-4b0fe28e2086>:9: PolarsInefficientMapWarning: 
+Expr.map_elements is significantly slower than the native expressions API.
+Only use if you absolutely CANNOT implement your logic otherwise.
+Replace this expression...
+  - pl.col("text").map_elements(lambda x: ...)
+with this one instead:
+  + pl.col("text").str.to_uppercase()
+
+  pl.col("text").map_elements(lambda x: x.upper()).alias("uppercase")
+```
+The reason for this warning is unlike native polars expressions, map_elements are not parallelized and usually involves data copy betten polars's rust engine and python interpreter.
+When we use the suggested code, time performance increased more than 3x for this small dataset and simple task.
+```python
+t0 = time.time()
+result = df.with_columns(
+    pl.col("text").str.to_uppercase().alias("uppercase")
+)
+t1 = time.time()
+print(f"native expression: {t1-t0}")
+```
+
+## map_batches
+
+`map_batches` is another tool that applies a Python function to batches (chunks) of data in polars. It's a middle group beteewn `map_elements` and native expression. It also allows using numpy/other libraries on chunks, so it might be much faster than native expression when these library are highly optimized.
+
+Let's look at an example below:
+```python
+import polars as pl
+import numpy as np
+import time
+
+n_rows = 1_000_000
+n_groups = 4
+unique_groups = [f"grp_{i}" for i in range(n_groups)]
+df = pl.DataFrame({
+    "value": np.random.randn(n_rows),
+    "group": np.random.choice(unique_groups, n_rows)
+})
+
+
+group_stats = df.group_by("group").agg([
+    pl.col("value").mean().alias("mean"),
+    pl.col("value").std().alias("std")
+])
+# Method 1: map_elements (SLOW)
+start = time.time()
+result = df.join(group_stats, on="group").with_columns(
+    pl.struct(["value", "mean", "std"])
+    .map_elements(
+        lambda row: (row["value"] - row["mean"]) / row["std"],
+        return_dtype=pl.Float64
+    )
+    .alias("z_score")
+)
+total = time.time() - start
+print(f"map_elements (1M rows):     {total:.4f} seconds")
+
+# Method 2: Native expression (FAST)
+start = time.time()
+result = df.with_columns(
+    ((pl.col("value") - pl.col("value").mean().over("group")) / 
+     pl.col("value").std().over("group"))
+    .alias("z_score")
+)
+total = time.time() - start
+print(f"Native expression (1M rows): {total:.4f} seconds")
+
+# Method 3: map_batches (MIDDLE GROUND)
+def normalize_batch(series: pl.Series) -> pl.Series:
+    # Using numpy for vectorized operations on the batch
+    arr = series.to_numpy()
+    return pl.Series((arr - arr.mean()) / arr.std())
+
+start = time.time()
+result = df.with_columns(
+    pl.col("value").map_batches(normalize_batch).over("group").alias("z_score")
+)
+total = time.time() - start
+print(f"map_batches (1M rows): {total:.4f} seconds")
+
+```
+When you look at the result below, you will find out map_batches is faster than native expression and map_elements is the slowest.
+
+```
+map_elements (1M rows):     0.3763 seconds
+Native expression (1M rows): 0.0362 seconds
+map_batches (1M rows): 0.0299 seconds
+```
+
+But if we increase the n_groups to 10000, we will get result below:
+```
+map_elements (1M rows):     0.6927 seconds
+Native expression (1M rows): 0.0621 seconds
+map_batches (1M rows): 0.4327 seconds
+```
+The result reverted, the number of groups decies how many context switches polars has to perform from rust engine to numpy. The more complicate the logic is, the more benefits native expression will bring.
+
+
+## Resources
+
+- [Polars map_elements Documentation](https://docs.pola.rs/py-polars/html/reference/expressions/api/polars.Expr.map_elements.html)
+- [Polars map_batches Documentation](https://docs.pola.rs/py-polars/html/reference/expressions/api/polars.Expr.map_batches.html)
+- [Polars Expression API](https://docs.pola.rs/py-polars/html/reference/expressions.html)
