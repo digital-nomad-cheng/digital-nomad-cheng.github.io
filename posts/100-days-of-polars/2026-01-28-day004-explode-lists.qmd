@@ -1,0 +1,386 @@
+---
+title: "100 Days of Polars - Day 004: Working with Lists - explode, implode, and List Operations"
+author: "NomadC"
+date: "2026-01-28"
+categories: [polars, data-engineering, 100-days-of-polars]
+description: "Understanding how to work with nested list data in Polars using explode, implode, and list operations"
+---
+
+## Introduction
+
+Today we'll explore how to work with list columns in Polars. Lists are a powerful feature that allow you to store multiple values in a single cell, making it easy to represent nested or hierarchical data. We'll cover `explode` to flatten lists, `implode` to create lists, and various list operations.
+
+```python
+import polars as pl
+
+# Create a DataFrame with a list column
+df = pl.DataFrame({
+    "user_id": [1, 2, 3],
+    "name": ["Alice", "Bob", "Charlie"],
+    "purchases": [
+        ["laptop", "mouse", "keyboard"],
+        ["phone"],
+        ["tablet", "headphones"]
+    ]                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+})
+
+print(df)
+```
+
+```
+shape: (3, 3)
+┌─────────┬─────────┬──────────────────────────────┐
+│ user_id ┆ name    ┆ purchases                    │
+│ ---     ┆ ---     ┆ ---                          │
+│ i64     ┆ str     ┆ list[str]                    │
+╞═════════╪═════════╪══════════════════════════════╡
+│ 1       ┆ Alice   ┆ ["laptop", "mouse", "keyb... │
+│ 2       ┆ Bob     ┆ ["phone"]                    │
+│ 3       ┆ Charlie ┆ ["tablet", "headphones"]     │
+└─────────┴─────────┴──────────────────────────────┘
+```
+
+## Exploding Lists
+
+The `explode` method transforms each element of a list into a separate row, duplicating the other column values. This is useful when you need to analyze individual list elements.
+
+```python
+# Explode the purchases column
+exploded_df = df.explode("purchases")
+print(exploded_df)
+```
+
+```
+shape: (6, 3)
+┌─────────┬─────────┬───────────┐
+│ user_id ┆ name    ┆ purchases │
+│ ---     ┆ ---     ┆ ---       │
+│ i64     ┆ str     ┆ str       │
+╞═════════╪═════════╪═══════════╡
+│ 1       ┆ Alice   ┆ laptop    │
+│ 1       ┆ Alice   ┆ mouse     │
+│ 1       ┆ Alice   ┆ keyboard  │
+│ 2       ┆ Bob     ┆ phone     │
+│ 3       ┆ Charlie ┆ tablet    │
+│ 3       ┆ Charlie ┆ headphones│
+└─────────┴─────────┴───────────┘
+```
+
+You can explode multiple columns simultaneously if they have the same length:
+
+```python
+df_multi = pl.DataFrame({
+    "id": [1, 2],
+    "values_a": [[1, 2, 3], [4, 5]],
+    "values_b": [["a", "b", "c"], ["d", "e"]]
+})
+
+# Explode both list columns
+exploded_multi = df_multi.explode(["values_a", "values_b"])
+print(exploded_multi)
+```
+
+```
+shape: (5, 3)
+┌─────┬──────────┬──────────┐
+│ id  ┆ values_a ┆ values_b │
+│ --- ┆ ---      ┆ ---      │
+│ i64 ┆ i64      ┆ str      │
+╞═════╪══════════╪══════════╡
+│ 1   ┆ 1        ┆ a        │
+│ 1   ┆ 2        ┆ b        │
+│ 1   ┆ 3        ┆ c        │
+│ 2   ┆ 4        ┆ d        │
+│ 2   ┆ 5        ┆ e        │
+└─────┴──────────┴──────────┘
+```
+
+## Creating Lists with implode
+
+The `implode` method (also known as `list` in aggregation context) groups values back into lists. This is the inverse operation of `explode`. `implode` is called automatically in `group_by().agg()` operations.
+
+```python
+# Create individual purchase records
+purchases_df = pl.DataFrame({
+    "user_id": [1, 1, 1, 2, 3, 3],
+    "item": ["laptop", "mouse", "keyboard", "phone", "tablet", "headphones"],
+    "price": [1200, 25, 75, 800, 600, 150]
+})
+
+# Group items back into lists per user
+grouped_df = purchases_df.group_by("user_id").agg([
+    pl.col("item").alias("items"),
+    pl.col("price").sum().alias("total_spent")
+])
+
+print(grouped_df)
+```
+
+```
+shape: (3, 3)
+┌─────────┬──────────────────────────────┬─────────────┐
+│ user_id ┆ items                        ┆ total_spent │
+│ ---     ┆ ---                          ┆ ---         │
+│ i64     ┆ list[str]                    ┆ i64         │
+╞═════════╪══════════════════════════════╪═════════════╡
+│ 1       ┆ ["laptop", "mouse", "keyb... ┆ 1300        │
+│ 2       ┆ ["phone"]                    ┆ 800         │
+│ 3       ┆ ["tablet", "headphones"]     ┆ 750         │
+└─────────┴──────────────────────────────┴─────────────┘
+```
+
+## List Operations
+
+Polars provides a rich set of operations for working with list columns through the `.list` namespace.
+
+### Getting List Length
+
+```python
+df_with_length = df.with_columns(
+    pl.col("purchases").list.len().alias("num_purchases")
+)
+print(df_with_length)
+```
+
+```
+shape: (3, 4)
+┌─────────┬─────────┬──────────────────────────────┬───────────────┐
+│ user_id ┆ name    ┆ purchases                    ┆ num_purchases │
+│ ---     ┆ ---     ┆ ---                          ┆ ---           │
+│ i64     ┆ str     ┆ list[str]                    ┆ u32           │
+╞═════════╪═════════╪══════════════════════════════╪═══════════════╡
+│ 1       ┆ Alice   ┆ ["laptop", "mouse", "keyb... ┆ 3             │
+│ 2       ┆ Bob     ┆ ["phone"]                    ┆ 1             │
+│ 3       ┆ Charlie ┆ ["tablet", "headphones"]     ┆ 2             │
+└─────────┴─────────┴──────────────────────────────┴───────────────┘
+```
+
+### Accessing List Elements
+
+```python
+# Get the first item from each list
+df_first = df.with_columns(
+    pl.col("purchases").list.first().alias("first_purchase")
+)
+print(df_first)
+
+# Get the last item
+df_last = df.with_columns(
+    pl.col("purchases").list.last().alias("last_purchase")
+)
+
+# Get item at specific index
+df_indexed = df.with_columns(
+    pl.col("purchases").list.get(1).alias("second_purchase")
+)
+print(df_indexed)
+```
+
+### Slicing Lists
+
+```python
+# Get first 2 items from each list
+df_sliced = df.with_columns(
+    pl.col("purchases").list.head(2).alias("first_two")
+)
+print(df_sliced)
+
+# Get all items except the first
+df_tail = df.with_columns(
+    pl.col("purchases").list.tail(-1).alias("rest")
+)
+```
+
+### Filtering and Transforming Lists
+
+```python
+# Check if lists contain specific values
+df_contains = df.with_columns(
+    pl.col("purchases").list.contains("laptop").alias("bought_laptop")
+)
+print(df_contains)
+
+# Apply expressions to list elements
+df_numbers = pl.DataFrame({
+    "id": [1, 2, 3],
+    "values": [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+})
+
+# Square all values in each list
+df_squared = df_numbers.with_columns(
+    pl.col("values").list.eval(pl.element() * 2).alias("doubled")
+)
+print(df_squared)
+```
+
+### Concatenating Lists
+
+```python
+df_concat = pl.DataFrame({
+    "list1": [[1, 2], [3, 4]],
+    "list2": [[5, 6], [7, 8]]
+})
+
+# Concatenate two list columns
+df_merged = df_concat.with_columns(
+    pl.concat_list(["list1", "list2"]).alias("combined")
+)
+print(df_merged)
+```
+
+```
+shape: (2, 3)
+┌───────────┬───────────┬──────────────────┐
+│ list1     ┆ list2     ┆ combined         │
+│ ---       ┆ ---       ┆ ---              │
+│ list[i64] ┆ list[i64] ┆ list[i64]        │
+╞═══════════╪═══════════╪══════════════════╡
+│ [1, 2]    ┆ [5, 6]    ┆ [1, 2, 5, 6]     │
+│ [3, 4]    ┆ [7, 8]    ┆ [3, 4, 7, 8]     │
+└───────────┴───────────┴──────────────────┘
+```
+## Performance Considerations
+
+Working with list columns is generally efficient in Polars, but keep these tips in mind:
+
+1. **Use native list operations** instead of exploding and re-aggregating when possible
+2. **Explode strategically** - only when you need row-level operations
+3. **List operations are vectorized** - they're much faster than using `map_elements`
+4. **Consider Arrow's memory layout** - lists are stored efficiently in memory
+
+```python
+import time
+
+# Create a larger dataset
+n = 100_000
+large_df = pl.DataFrame({
+    "id": range(n),
+    "values": [[i, i+1, i+2] for i in range(n)]
+})
+
+# Method 1: Using native list operations (FAST)
+start = time.time()
+result1 = large_df.with_columns(
+    pl.col("values").list.sum().alias("sum")
+)
+time1 = time.time() - start
+print(f"Native list.sum(): {time1:.4f} seconds")
+
+# Method 2: Explode and aggregate (SLOWER)
+start = time.time()
+result2 = large_df.explode("values").group_by("id").agg(
+    pl.col("values").sum().alias("sum")
+)
+time2 = time.time() - start
+print(f"Explode + aggregate: {time2:.4f} seconds")
+
+print(f"Native is {time2/time1:.1f}x faster")
+```
+
+## Practice Exercise
+
+Now it's time to practice! Try solving this exercise using list operations:
+
+**Scenario**: You're analyzing e-commerce data with order information:
+
+```python
+import polars as pl
+
+# Create sample e-commerce data
+orders = pl.DataFrame({
+    "order_id": [1, 2, 3, 4],
+    "customer_id": [101, 102, 101, 103],
+    "items": [
+        ["laptop", "mouse"],
+        ["phone", "case", "charger"],
+        ["keyboard", "monitor"],
+        ["tablet"]
+    ],
+    "prices": [
+        [1200, 25],
+        [800, 15, 30],
+        [75, 300],
+        [600]
+    ]
+})
+```
+
+**Tasks**:
+
+1. Add a column `item_count` that shows the number of items in each order
+2. Explode the data to create one row per item (hint: explode both `items` and `prices` columns)
+3. Filter to find only orders that have multiple items
+4. Add a column `max_price` that shows the most expensive item in each order
+5. Create a customer purchase history showing all items purchased, total amount spent, and number of unique orders per customer
+
+**Bonus Challenge**: 
+For each customer, create a new column that shows only items that cost more than $100. Use list operations to filter the prices and corresponding items lists.
+
+<details>
+<summary>Click to see solutions</summary>
+
+```python
+# Task 1: Total items per order
+items_per_order = orders.with_columns(
+    pl.col("items").list.len().alias("item_count")
+)
+print(items_per_order)
+
+# Task 2: Explode to analyze individual items
+exploded_orders = orders.explode(["items", "prices"])
+print(exploded_orders)
+
+# Task 3: Find customers who bought multiple items in an order
+multi_item_orders = orders.filter(
+    pl.col("items").list.len() > 1
+)
+print(multi_item_orders)
+
+# Task 4: Get most expensive item per order
+most_expensive = orders.with_columns(
+    pl.col("prices").list.max().alias("max_price")
+)
+print(most_expensive)
+
+# Task 5: Customer purchase history
+customer_history = exploded_orders.group_by("customer_id").agg([
+    pl.col("items").alias("all_items"),
+    pl.col("prices").sum().alias("total_spent"),
+    pl.col("order_id").n_unique().alias("num_orders")
+])
+print(customer_history)
+
+# Bonus: Filter expensive items per customer
+expensive_items = orders.with_columns(
+    pl.col("items").list.gather(
+        pl.col("prices").list.eval(pl.arg_where(pl.element() > 100))
+    ).alias("expensive_items"),
+    
+    pl.col("prices").list.gather(
+        pl.col("prices").list.eval(pl.arg_where(pl.element() > 100))
+    ).alias("expensive_prices")
+)
+```
+
+Expected output for Task 5:
+```
+shape: (3, 4)
+┌─────────────┬──────────────────────────────┬─────────────┬────────────┐
+│ customer_id ┆ all_items                    ┆ total_spent ┆ num_orders │
+│ ---         ┆ ---                          ┆ ---         ┆ ---        │
+│ i64         ┆ list[str]                    ┆ i64         ┆ u32        │
+╞═════════════╪══════════════════════════════╪═════════════╪════════════╡
+│ 101         ┆ ["laptop", "mouse", "keyb... ┆ 1600        ┆ 2          │
+│ 102         ┆ ["phone", "case", "charger"] ┆ 845         ┆ 1          │
+│ 103         ┆ ["tablet"]                   ┆ 600         ┆ 1          │
+└─────────────┴──────────────────────────────┴─────────────┴────────────┘
+```
+
+</details>
+
+
+## Resources
+
+- [Polars List Operations Documentation](https://docs.pola.rs/py-polars/html/reference/expressions/list.html)
+- [Polars explode Documentation](https://docs.pola.rs/py-polars/html/reference/dataframe/api/polars.DataFrame.explode.html)
+- [Working with Nested Data in Polars](https://pola-rs.github.io/polars-book/user-guide/expressions/lists.html)
