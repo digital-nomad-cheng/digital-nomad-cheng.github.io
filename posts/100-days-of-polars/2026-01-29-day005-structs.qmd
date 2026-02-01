@@ -1,0 +1,420 @@
+---
+title: "100 Days of Polars - Day 005: Working with Structs - Nested Data Structures"
+author: "NomadC"
+date: "2026-01-29"
+categories: [polars, data-engineering, 100-days-of-polars]
+description: "Understanding how to work with struct columns in Polars for hierarchical and nested data"
+---
+
+## Introduction
+
+Today we'll explore structs in Polars, which allow you to store multiple fields as a single column. Think of structs as nested dictionaries or JSON objects within your DataFrame. They're perfect for representing complex, hierarchical data while keeping your DataFrame organized.
+
+```python
+import polars as pl
+
+# Create a DataFrame with a struct column
+df = pl.DataFrame({
+    "user_id": [1, 2, 3],
+    "name": ["Alice", "Bob", "Charlie"],
+    "address": [
+        {"street": "123 Main St", "city": "NYC", "zip": "10001"},
+        {"street": "456 Oak Ave", "city": "LA", "zip": "90001"},
+        {"street": "789 Pine Rd", "city": "Chicago", "zip": "60601"}
+    ]
+})
+
+print(df)
+```
+
+```
+shape: (3, 3)
+┌─────────┬─────────┬─────────────────────────────┐
+│ user_id ┆ name    ┆ address                     │
+│ ---     ┆ ---     ┆ ---                         │
+│ i64     ┆ str     ┆ struct[3]                   │
+╞═════════╪═════════╪═════════════════════════════╡
+│ 1       ┆ Alice   ┆ {123 Main St,NYC,10001}     │
+│ 2       ┆ Bob     ┆ {456 Oak Ave,LA,90001}      │
+│ 3       ┆ Charlie ┆ {789 Pine Rd,Chicago,60601} │
+└─────────┴─────────┴─────────────────────────────┘
+```
+
+## Creating Structs
+
+### From Python Dictionaries
+
+The simplest way to create structs is from Python dictionaries:
+
+```python
+df = pl.DataFrame({
+    "id": [1, 2],
+    "person": [
+        {"name": "Alice", "age": 30},
+        {"name": "Bob", "age": 25}
+    ]
+})
+```
+
+### Using `pl.struct()`
+
+You can create struct columns from existing columns:
+
+```python
+df = pl.DataFrame({
+    "first_name": ["Alice", "Bob"],
+    "last_name": ["Smith", "Jones"],
+    "age": [30, 25]
+})
+
+# Combine columns into a struct
+df_with_struct = df.select([
+    pl.struct(["first_name", "last_name", "age"]).alias("person")
+])
+print(df_with_struct)
+```
+
+```
+shape: (2, 1)
+┌─────────────────────────┐
+│ person                  │
+│ ---                     │
+│ struct[3]               │
+╞═════════════════════════╡
+│ {Alice,Smith,30}        │
+│ {Bob,Jones,25}          │
+└─────────────────────────┘
+```
+
+You can also create named structs with different field names:
+
+```python
+df_renamed = df.select([
+    pl.struct(
+        first=pl.col("first_name"),
+        last=pl.col("last_name"),
+        years=pl.col("age")
+    ).alias("person")
+])
+```
+
+## Accessing Struct Fields
+
+### Using `.field()`
+
+Access individual fields from a struct column:
+
+```python
+df = pl.DataFrame({
+    "id": [1, 2, 3],
+    "address": [
+        {"street": "123 Main St", "city": "NYC"},
+        {"street": "456 Oak Ave", "city": "LA"},
+        {"street": "789 Pine Rd", "city": "Chicago"}
+    ]
+})
+
+# Extract specific fields
+df_with_fields = df.with_columns([
+    pl.col("address").struct.field("city").alias("city"),
+    pl.col("address").struct.field("street").alias("street")
+])
+print(df_with_fields)
+```
+
+```
+shape: (3, 4)
+┌─────┬──────────────────────────┬─────────┬──────────────┐
+│ id  ┆ address                  ┆ city    ┆ street       │
+│ --- ┆ ---                      ┆ ---     ┆ ---          │
+│ i64 ┆ struct[2]                ┆ str     ┆ str          │
+╞═════╪══════════════════════════╪═════════╪══════════════╡
+│ 1   ┆ {123 Main St,NYC}        ┆ NYC     ┆ 123 Main St  │
+│ 2   ┆ {456 Oak Ave,LA}         ┆ LA      ┆ 456 Oak Ave  │
+│ 3   ┆ {789 Pine Rd,Chicago}    ┆ Chicago ┆ 789 Pine Rd  │
+└─────┴──────────────────────────┴─────────┴──────────────┘
+```
+
+### Using `.struct.unnest()`
+
+Unnest a struct to expand all fields into separate columns:
+
+```python
+df_unnested = df.unnest("address")
+print(df_unnested)
+```
+
+```
+shape: (3, 3)
+┌─────┬──────────────┬─────────┐
+│ id  ┆ street       ┆ city    │
+│ --- ┆ ---          ┆ ---     │
+│ i64 ┆ str          ┆ str     │
+╞═════╪══════════════╪═════════╡
+│ 1   ┆ 123 Main St  ┆ NYC     │
+│ 2   ┆ 456 Oak Ave  ┆ LA      │
+│ 3   ┆ 789 Pine Rd  ┆ Chicago │
+└─────┴──────────────┴─────────┘
+```
+
+## Renaming Struct Fields
+
+You can rename fields within a struct:
+
+```python
+df = pl.DataFrame({
+    "person": [
+        {"first": "Alice", "last": "Smith"},
+        {"first": "Bob", "last": "Jones"}
+    ]
+})
+
+# Rename struct fields
+df_renamed = df.with_columns(
+    pl.col("person").struct.rename_fields(["first_name", "last_name"])
+)
+print(df_renamed)
+```
+
+## Working with Nested Structs
+
+Structs can contain other structs, creating deeply nested data:
+
+```python
+df = pl.DataFrame({
+    "user_id": [1, 2],
+    "profile": [
+        {
+            "name": {"first": "Alice", "last": "Smith"},
+            "contact": {"email": "alice@example.com", "phone": "555-0001"}
+        },
+        {
+            "name": {"first": "Bob", "last": "Jones"},
+            "contact": {"email": "bob@example.com", "phone": "555-0002"}
+        }
+    ]
+})
+
+# Access nested fields
+df_with_nested = df.with_columns([
+    pl.col("profile").struct.field("name").struct.field("first").alias("first_name"),
+    pl.col("profile").struct.field("contact").struct.field("email").alias("email")
+])
+print(df_with_nested)
+```
+
+## JSON to Struct
+
+Polars can parse JSON strings into structs:
+
+```python
+df = pl.DataFrame({
+    "id": [1, 2],
+    "json_data": [
+        '{"name": "Alice", "age": 30, "city": "NYC"}',
+        '{"name": "Bob", "age": 25, "city": "LA"}'
+    ]
+})
+
+# Parse JSON strings to structs
+df_parsed = df.with_columns(
+    pl.col("json_data").str.json_decode(pl.Struct([
+            pl.Field("name", pl.Utf8),
+            pl.Field("age", pl.Int64),
+            pl.Field("city", pl.Utf8)
+        ])).alias("parsed")
+)
+print(df_parsed)
+
+# Extract specific fields from parsed JSON
+df_extracted = df_parsed.with_columns([
+    pl.col("parsed").struct.field("name").alias("name"),
+    pl.col("parsed").struct.field("age").alias("age")
+])
+print(df_extracted)
+```
+## `.struct.with_fields()`
+```python
+import polars as pl
+
+df = pl.DataFrame({
+    "user_data": [
+        {"name": "alice", "score": 85, "active": True},
+        {"name": "bob", "score": 42, "active": False}
+    ]
+})
+
+# Update score and add a new category field inside the struct
+df_updated = df.with_columns(
+    pl.col("user_data").struct.with_fields(
+        # 1. Update an existing field
+        pl.field("score") + 5,
+        
+        # 2. Add a brand new field inside the struct
+        is_passing = pl.field("score") >= 50,
+        
+        # 3. Use logic from one field to update another
+        active = pl.when(pl.field("score") > 80).then(True).otherwise(pl.field("active"))
+    )
+)
+```
+## Combining Structs and Lists
+
+You can have lists of structs or structs containing lists:
+
+```python
+# List of structs
+df_list_of_structs = pl.DataFrame({
+    "user_id": [1, 2],
+    "orders": [
+        [
+            {"order_id": 101, "amount": 50.0},
+            {"order_id": 102, "amount": 75.0}
+        ],
+        [
+            {"order_id": 201, "amount": 100.0}
+        ]
+    ]
+})
+
+# Explode the list and access struct fields
+df_exploded = df_list_of_structs.explode("orders").with_columns([
+    pl.col("orders").struct.field("order_id").alias("order_id"),
+    pl.col("orders").struct.field("amount").alias("amount")
+])
+print(df_exploded)
+```
+
+## Practice Exercise
+
+Now it's time to practice! Try solving this exercise using struct operations:
+
+**Scenario**: You're analyzing customer data from an e-commerce API that returns nested JSON data:
+
+```python
+import polars as pl
+
+customers = pl.DataFrame({
+    "customer_id": [1, 2, 3],
+    "profile": [
+        {
+            "name": {"first": "Alice", "last": "Johnson"},
+            "age": 28,
+            "address": {"city": "NYC", "state": "NY", "zip": "10001"}
+        },
+        {
+            "name": {"first": "Bob", "last": "Smith"},
+            "age": 35,
+            "address": {"city": "Los Angeles", "state": "CA", "zip": "90001"}
+        },
+        {
+            "name": {"first": "Charlie", "last": "Brown"},
+            "age": 42,
+            "address": {"city": "Chicago", "state": "IL", "zip": "60601"}
+        }
+    ],
+    "orders": [
+        [{"order_id": 101, "total": 150.50}, {"order_id": 102, "total": 200.00}],
+        [{"order_id": 201, "total": 89.99}],
+        [{"order_id": 301, "total": 450.00}, {"order_id": 302, "total": 125.75}, {"order_id": 303, "total": 75.00}]
+    ]
+})
+```
+
+**Tasks**:
+
+1. Extract the first name and city from each customer into separate columns
+2. Create a new column `full_name` by combining first and last names
+3. Unnest the address information into separate columns (city, state, zip)
+4. Filter customers who are older than 30 years
+5. Explode the orders list and calculate the total amount spent per customer
+
+**Bonus Challenge**: 
+Create a new struct column called `customer_summary` that contains:
+- `full_name` (first + last)
+- `location` (city, state)
+- `order_count` (number of orders)
+- `total_spent` (sum of all order totals)
+
+<details>
+<summary>Click to see solutions</summary>
+
+```python
+# Task 1: Extract first name and city
+task1 = customers.with_columns([
+    pl.col("profile").struct.field("name").struct.field("first").alias("first_name"),
+    pl.col("profile").struct.field("address").struct.field("city").alias("city")
+])
+print(task1)
+
+# Task 2: Create full_name column
+task2 = customers.with_columns(
+    (pl.col("profile").struct.field("name").struct.field("first") + " " +
+     pl.col("profile").struct.field("name").struct.field("last")).alias("full_name")
+)
+print(task2)
+
+# Task 3: Unnest address information
+task3 = customers.with_columns(
+    pl.col("profile").struct.field("address").alias("address")
+).unnest("address")
+print(task3)
+
+# Task 4: Filter customers older than 30
+task4 = customers.filter(
+    pl.col("profile").struct.field("age") > 30
+)
+print(task4)
+
+# Task 5: Explode orders and calculate total spent per customer
+task5 = customers.explode("orders").with_columns([
+    pl.col("orders").struct.field("order_id").alias("order_id"),
+    pl.col("orders").struct.field("total").alias("order_total")
+]).group_by("customer_id").agg([
+    pl.col("order_total").sum().alias("total_spent"),
+    pl.col("order_id").count().alias("order_count")
+])
+print(task5)
+
+# Bonus: Create customer_summary struct
+bonus = customers.explode("orders").with_columns([
+    pl.col("orders").struct.field("total").alias("order_total")
+]).group_by("customer_id").agg([
+    pl.col("profile").first().alias("profile"),
+    pl.col("order_total").sum().alias("total_spent"),
+    pl.col("order_total").count().alias("order_count")
+]).with_columns(
+    pl.struct([
+        (pl.col("profile").struct.field("name").struct.field("first") + " " +
+         pl.col("profile").struct.field("name").struct.field("last")).alias("full_name"),
+        (pl.col("profile").struct.field("address").struct.field("city") + ", " +
+         pl.col("profile").struct.field("address").struct.field("state")).alias("location"),
+        pl.col("order_count"),
+        pl.col("total_spent")
+    ]).alias("customer_summary")
+)
+print(bonus.select(["customer_id", "customer_summary"]))
+```
+
+Expected output for Task 5:
+```
+shape: (3, 3)
+┌─────────────┬─────────────┬─────────────┐
+│ customer_id ┆ total_spent ┆ order_count │
+│ ---         ┆ ---         ┆ ---         │
+│ i64         ┆ f64         ┆ u32         │
+╞═════════════╪═════════════╪═════════════╡
+│ 1           ┆ 350.5       ┆ 2           │
+│ 2           ┆ 89.99       ┆ 1           │
+│ 3           ┆ 650.75      ┆ 3           │
+└─────────────┴─────────────┴─────────────┘
+```
+
+</details>
+
+
+## Resources
+
+- [Polars Struct Operations Documentation](https://docs.pola.rs/py-polars/html/reference/expressions/struct.html)
+- [Working with Nested Data Types](https://pola-rs.github.io/polars-book/user-guide/expressions/structs.html)
+- [JSON Parsing in Polars](https://docs.pola.rs/py-polars/html/reference/expressions/api/polars.Expr.str.json_decode.html)
