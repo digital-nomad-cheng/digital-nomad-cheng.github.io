@@ -1,0 +1,251 @@
+---
+title: "100 Days of Polars - Day 007: Date/Time — Parsing, Durations, and Time Zones"
+author: "NomadC"
+date: "2026-02-03"
+categories: [polars, datetime, 100-days-of-polars]
+description: "Practical guide to parsing dates/times, working with durations, and handling time zones in Polars"
+toc: true
+---
+
+## Introduction
+
+Dates and times are everywhere in data: logs, events, financial records, and more. Today we'll cover the most useful Polars techniques for parsing date/time strings, measuring durations, and dealing with time zones so your pipelines remain robust and correct.
+
+### Quick topics
+- Parsing dates and datetimes from strings
+- Extracting components (year, month, hour, …)
+- Computing durations and converting units
+- Assigning and converting time zones
+
+## Parsing dates and datetimes
+
+Start by parsing strings into typed date/datetime columns using `str.strptime`.
+
+```python
+import polars as pl
+
+df = pl.DataFrame({
+    "date_str": ["2026-02-01", "2026-02-02"],
+    "dt_str": ["2026-02-01 08:30:00", "2026-02-02 17:45:30"]
+})
+
+# Parse date-only and full timestamps
+df_parsed = df.with_columns([
+    pl.col("date_str").str.strptime(pl.Date, "%Y-%m-%d").alias("date"),
+    pl.col("dt_str").str.strptime(pl.Datetime, "%Y-%m-%d %H:%M:%S").alias("ts")
+])
+
+print(df_parsed)
+```
+
+After parsing you can use the `dt` namespace to extract fields:
+
+```python
+df_parsed.select([
+    pl.col("ts").dt.year().alias("year"),
+    pl.col("ts").dt.month().alias("month"),
+    pl.col("ts").dt.hour().alias("hour")
+])
+```
+
+## Computing durations
+
+Find differences between timestamp columns to get a duration value. Durations are typed, and you can convert them to numeric units by casting.
+
+```python
+df_times = pl.DataFrame({
+    "start": ["2026-02-01 08:00:00", "2026-02-02 09:15:00"],
+    "end":   ["2026-02-01 10:30:00", "2026-02-02 11:00:00"]
+}).with_columns([
+    pl.col("start").str.strptime(pl.Datetime, "%Y-%m-%d %H:%M:%S").alias("start"),
+    pl.col("end").str.strptime(pl.Datetime, "%Y-%m-%d %H:%M:%S").alias("end")
+])
+
+# Duration (typed) and total seconds (numeric)
+df_dur = df_times.with_columns([
+    (pl.col("end") - pl.col("start")).alias("duration"),
+    ((pl.col("end") - pl.col("start")).cast(pl.Int64) / 1_000_000_000).alias("duration_seconds")
+])
+
+print(df_dur)
+```
+
+Notes:
+- Casting a duration to `Int64` yields the underlying integer (nanoseconds), so dividing by `1_000_000_000` gives seconds.
+- You can similarly compute minutes/hours by dividing by `60` or `3600`.
+
+## Unix timestamps
+
+Working with Unix timestamps (epoch time) is common in APIs and databases. Polars provides `from_epoch` to convert these to datetimes:
+
+```python
+df_unix = pl.DataFrame({
+    "ts_sec": [1706782800, 1706869200],
+    "ts_ms": [1706782800000, 1706869200000]
+})
+
+# Convert seconds and milliseconds to datetime
+df_unix.with_columns([
+    pl.from_epoch(pl.col("ts_sec"), time_unit="s").alias("from_seconds"),
+    pl.from_epoch(pl.col("ts_ms"), time_unit="ms").alias("from_milliseconds")
+])
+```
+
+Supported time units: `s` (seconds), `ms` (milliseconds), `us` (microseconds), `ns` (nanoseconds).
+
+## Date truncation
+
+Grouping by time periods is essential for time-series analysis. Use `dt.truncate` to round down to calendar periods:
+
+```python
+df_ts = pl.DataFrame({
+    "ts": ["2026-02-03 14:35:00", "2026-02-03 14:55:00", "2026-02-04 09:00:00"]
+}).with_columns(
+    pl.col("ts").str.strptime(pl.Datetime, "%Y-%m-%d %H:%M:%S").alias("ts")
+)
+
+# Truncate to different periods
+df_ts.with_columns([
+    pl.col("ts").dt.truncate("1h").alias("hourly"),
+    pl.col("ts").dt.truncate("1d").alias("daily"),
+    pl.col("ts").dt.truncate("1w").alias("weekly")
+])
+```
+
+Common truncation periods: `1h` (hour), `1d` (day), `1w` (week), `1mo` (month).
+
+## Adding durations
+
+Add or subtract durations using `pl.duration(...)` literals or by building expressions:
+
+```python
+df = pl.DataFrame({"ts": ["2026-02-01 12:00:00"]}).with_columns(
+    pl.col("ts").str.strptime(pl.Datetime, "%Y-%m-%d %H:%M:%S").alias("ts")
+)
+
+# Add 90 minutes
+df.with_columns(
+    (pl.col("ts") + pl.duration(minutes=90)).alias("ts_plus_90m")
+)
+```
+
+If you need rolling windows by time, you can use time-based grouping/aggregation with timestamps as the grouping key.
+
+## Offset arithmetic
+
+For calendar-based shifts (not just duration), use `dt.offset_by` which handles variable-length periods like months and leap years correctly:
+
+```python
+df = pl.DataFrame({"ts": ["2026-01-31 12:00:00"]}).with_columns(
+    pl.col("ts").str.strptime(pl.Datetime, "%Y-%m-%d %H:%M:%S").alias("ts")
+)
+
+# Add calendar periods
+df.with_columns([
+    pl.col("ts").dt.offset_by("1d").alias("plus_1_day"),
+    pl.col("ts").dt.offset_by("1mo").alias("plus_1_month"),  # Handles Feb 28
+    pl.col("ts").dt.offset_by("-1w").alias("minus_1_week")
+])
+```
+
+Offset strings: `d` (days), `w` (weeks), `mo` (months), `y` (years), `h` (hours), `m` (minutes), `s` (seconds).
+
+## Filtering by date range
+
+Use `is_between` for efficient date range filtering:
+
+```python
+start = pl.lit(datetime(2026, 2, 1))
+end = pl.lit(datetime(2026, 2, 28))
+
+df.filter(pl.col("ts").is_between(start, end))
+```
+
+## Time zones: assign vs convert
+
+Time zones are subtle but important:
+- Assigning a time zone interprets a naive timestamp as being in that zone (no clock shift).
+- Converting a time zone shifts the instant to represent the same absolute time in a different zone.
+
+Example:
+
+```python
+df_tz = pl.DataFrame({
+    "ts": ["2026-02-01 12:00:00", "2026-06-01 12:00:00"]
+}).with_columns(
+    pl.col("ts").str.strptime(pl.Datetime, "%Y-%m-%d %H:%M:%S").alias("ts")
+)
+
+# Interpret naive timestamps as UTC (assign tz)
+df_tz = df_tz.with_columns(pl.col("ts").dt.replace_time_zone("UTC").alias("ts_utc"))
+
+# Convert to America/Los_Angeles (shifts the clock)
+df_tz = df_tz.with_columns(pl.col("ts_utc").dt.convert_time_zone("America/Los_Angeles").alias("ts_pt"))
+
+print(df_tz)
+```
+
+When ingesting logs from multiple services, ensure you either normalize timestamps to UTC or carry the timezone information so downstream aggregations align.
+
+## Common pitfalls
+- Parsing with the wrong format string will produce nulls; use `strict=False` if your data is noisy.
+- Beware DST transitions when summarizing daily/hourly counts; converting to local time can cause duplicated or missing clock times.
+- Floating math on durations requires attention to units (ns → s → hours).
+
+## Practice Exercise
+
+**Scenario**: You have event data with a naive timestamp and a separate timezone field. Do the following:
+
+1. Parse the timestamp as naive `Datetime`.
+2. Assign the timezone from the `tz` column (per-row assignment).
+3. Convert all timestamps to UTC.
+4. Compute event duration from `start` to `end` in minutes.
+
+Starter data:
+
+```python
+events = pl.DataFrame({
+    "event_id": [1, 2],
+    "start": ["2026-02-01 08:00:00", "2026-06-01 09:30:00"],
+    "end":   ["2026-02-01 10:15:00", "2026-06-01 10:00:00"],
+    "tz": ["Europe/Paris", "America/Los_Angeles"]
+})
+```
+
+<details>
+<summary>Click to see solution</summary>
+
+```python
+# Solution (one approach)
+events_parsed = events.with_columns([
+    pl.col("start").str.strptime(pl.Datetime, "%Y-%m-%d %H:%M:%S").alias("start"),
+    pl.col("end").str.strptime(pl.Datetime, "%Y-%m-%d %H:%M:%S").alias("end")
+])
+
+# Assign tz per-row using map_elements, then convert to UTC
+events_tz = events_parsed.with_columns([
+    pl.struct(["start", "tz"]).map_elements(
+        lambda x: x["start"].dt.replace_time_zone(x["tz"])
+    ).alias("start_tz"),
+    pl.struct(["end", "tz"]).map_elements(
+        lambda x: x["end"].dt.replace_time_zone(x["tz"])
+    ).alias("end_tz")
+]).with_columns([
+    pl.col("start_tz").dt.convert_time_zone("UTC").alias("start_utc"),
+    pl.col("end_tz").dt.convert_time_zone("UTC").alias("end_utc")
+])
+
+# Duration in minutes
+events_final = events_tz.with_columns(
+    ((pl.col("end_utc") - pl.col("start_utc")).cast(pl.Int64) / 1_000_000_000 / 60).alias("duration_minutes")
+)
+
+print(events_final.select(["event_id", "duration_minutes"]))
+```
+
+</details>
+
+## Resources
+
+- [Polars date/time docs](https://pola-rs.github.io/polars-book/user-guide/datetime.html)
+- [Python tz database (IANA zones)](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) 
