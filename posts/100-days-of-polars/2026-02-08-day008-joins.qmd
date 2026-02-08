@@ -1,0 +1,507 @@
+---
+title: "100 Days of Polars - Day 008: Mastering Joins - From Basic to Advanced"
+author: "NomadC"
+date: "2026-02-08"
+categories: [polars, data-engineering, joins, 100-days-of-polars]
+description: "Comprehensive guide to all join types in Polars with practical examples"
+toc: true
+---
+
+## Introduction
+
+Joins are fundamental to data engineering - they allow us to combine data from multiple sources. Polars offers a rich set of join operations that are optimized for performance. Today we'll explore all join types from basic to advanced, with practical examples you can use immediately.
+
+## Quick Reference
+
+| Join Type | What It Returns | Common Use Case |
+|-----------|----------------|-----------------|
+| `inner` | Only matching rows from both tables | Find common records |
+| `left` | All rows from left + matching from right | Enrich data with reference info |
+| `right` | All rows from right + matching from left | When right table is primary |
+| `full` | All rows from both tables | Combine two datasets completely |
+| `cross` | Cartesian product (every combination) | Generate all combinations |
+| `semi` | Left rows where key exists in right | Filter based on existence |
+| `anti` | Left rows where key NOT in right | Find missing records |
+| `asof` | Match on nearest key (time-series) | Join time-series data |
+
+## Setup: Sample Data
+
+```python
+import polars as pl
+
+# Left table: Orders
+orders = pl.DataFrame({
+    "order_id": [1, 2, 3, 4, 5],
+    "customer_id": [101, 102, 103, 104, 105],
+    "product": ["A", "B", "A", "C", "B"],
+    "amount": [100, 200, 150, 300, 250],
+})
+
+# Right table: Customers
+customers = pl.DataFrame({
+    "customer_id": [101, 102, 103, 106],
+    "name": ["Alice", "Bob", "Carol", "David"],
+    "city": ["NYC", "LA", "Chicago", "Seattle"],
+})
+
+# Products reference table
+products = pl.DataFrame({
+    "product": ["A", "B", "C", "D"],
+    "category": ["Electronics", "Books", "Clothing", "Food"],
+    "price": [99, 25, 50, 10],
+})
+```
+
+## Inner Join
+
+Returns only rows where keys match in **both** tables.
+
+```python
+# Find orders with valid customers
+inner_result = orders.join(
+    customers,
+    on="customer_id",
+    how="inner"
+)
+
+print(inner_result)
+```
+
+**Result:**
+```
+order_id | customer_id | product | amount | name  | city
+---------|-------------|---------|--------|-------|--------
+1        | 101         | A       | 100    | Alice | NYC
+2        | 102         | B       | 200    | Bob   | LA
+3        | 103         | A       | 150    | Carol | Chicago
+```
+
+**Key points:**
+- Order 4 and 5 (customers 104, 105) are excluded - not in customers table
+- Customer David (106) is excluded - has no orders
+- Only 3 rows returned
+
+## Left Join
+
+Returns **all rows from left** + matching from right (nulls where no match).
+
+```python
+# All orders, enrich with customer info where available
+left_result = orders.join(
+    customers,
+    on="customer_id",
+    how="left"
+)
+
+print(left_result)
+```
+
+**Result:**
+```
+order_id | customer_id | product | amount | name   | city
+---------|-------------|---------|--------|--------|--------
+1        | 101         | A       | 100    | Alice  | NYC
+2        | 102         | B       | 200    | Bob    | LA
+3        | 103         | A       | 150    | Carol  | Chicago
+4        | 104         | C       | 300    | null   | null
+5        | 105         | B       | 250    | null   | null
+```
+
+**Key points:**
+- All 5 orders preserved
+- Orders 4 and 5 have null customer info (customers 104, 105 not in reference table)
+- Most common join type for data enrichment
+
+## Right Join
+
+Returns **all rows from right** + matching from left (nulls where no match).
+
+```python
+# All customers, show their orders (if any)
+right_result = orders.join(
+    customers,
+    on="customer_id",
+    how="right"
+)
+
+print(right_result)
+```
+
+**Result:**
+```
+order_id | customer_id | product | amount | name  | city
+---------|-------------|---------|--------|-------|--------
+1        | 101         | A       | 100    | Alice | NYC
+2        | 102         | B       | 200    | Bob   | LA
+3        | 103         | A       | 150    | Carol | Chicago
+null     | 106         | null    | null   | David | Seattle
+```
+
+**Key points:**
+- All 4 customers preserved
+- David (106) has null order info - no orders
+- Similar to left join but keeps right side
+
+## Full/Outer Join
+
+Returns **all rows from both tables** (nulls where no match).
+
+```python
+# Complete view: all orders and all customers
+full_result = orders.join(
+    customers,
+    on="customer_id",
+    how="full"
+)
+
+print(full_result)
+```
+
+**Result:**
+```
+order_id | customer_id | product | amount | name   | city
+---------|-------------|---------|--------|--------|--------
+1        | 101         | A       | 100    | Alice  | NYC
+2        | 102         | B       | 200    | Bob    | LA
+3        | 103         | A       | 150    | Carol  | Chicago
+4        | 104         | C       | 300    | null   | null
+5        | 105         | B       | 250    | null   | null
+null     | 106         | null    | null   | David  | Seattle
+```
+
+**Key points:**
+- 6 rows total (union of both sets)
+- Preserves all information from both tables
+- Use when you need complete data from both sources
+
+## Cross Join
+
+Returns **Cartesian product** - every row from left combined with every row from right.
+
+```python
+# Generate all combinations
+cross_result = orders.join(
+    products.select("category").unique(),
+    how="cross"
+)
+
+print(f"Orders: {len(orders)}, Categories: {4}, Result: {len(cross_result)}")
+print(cross_result.head(8))
+```
+
+**Key points:**
+- No `on` parameter needed
+- Result has len(left) × len(right) rows
+- Use sparingly - can create huge datasets
+- Common use: generating test data or all possible combinations
+
+## Semi Join
+
+Returns **left rows where key exists in right** (no right columns added).
+
+```python
+# Find orders from known customers only (filter, don't enrich)
+semi_result = orders.join(
+    customers,
+    on="customer_id",
+    how="semi"
+)
+
+print(semi_result)
+```
+
+**Result:**
+```
+order_id | customer_id | product | amount
+---------|-------------|---------|--------
+1        | 101         | A       | 100
+2        | 102         | B       | 200
+3        | 103         | A       | 150
+```
+
+**Key points:**
+- Like `inner` but doesn't add right columns
+- Used for filtering only
+- More efficient than inner join when you don't need right columns
+- Orders 4 and 5 excluded (unknown customers)
+
+## Anti Join
+
+Returns **left rows where key does NOT exist in right**.
+
+```python
+# Find orders from unknown/missing customers
+anti_result = orders.join(
+    customers,
+    on="customer_id",
+    how="anti"
+)
+
+print(anti_result)
+```
+
+**Result:**
+```
+order_id | customer_id | product | amount
+---------|-------------|---------|--------
+4        | 104         | C       | 300
+5        | 105         | B       | 250
+```
+
+**Key points:**
+- Opposite of semi join
+- Great for data quality checks
+- Find orphaned records, missing references
+
+## AsOf Join (Time-Series)
+
+Matches on **nearest key** without exceeding - perfect for time-series.
+
+```python
+# Stock prices at different times
+prices = pl.DataFrame({
+    "time": [
+        "2026-01-01 09:00", "2026-01-01 09:05",
+        "2026-01-01 09:10", "2026-01-01 09:15"
+    ],
+    "price": [100.0, 101.5, 99.8, 102.0]
+}).with_columns(pl.col("time").str.strptime(pl.Datetime, "%Y-%m-%d %H:%M"))
+
+# Trades happening at various times
+trades = pl.DataFrame({
+    "time": [
+        "2026-01-01 09:02", "2026-01-01 09:07",
+        "2026-01-01 09:12"
+    ],
+    "volume": [100, 200, 150]
+}).with_columns(pl.col("time").str.strptime(pl.Datetime, "%Y-%m-%d %H:%M"))
+
+# Match each trade with the most recent price
+asof_result = trades.join_asof(
+    prices,
+    on="time",
+    strategy="backward"  # Use most recent price before trade
+)
+
+print(asof_result)
+```
+
+**Result:**
+```
+time                | volume | price
+--------------------|--------|-------
+2026-01-01 09:02:00 | 100    | 100.0  <- price at 09:00
+2026-01-01 09:07:00 | 200    | 101.5  <- price at 09:05
+2026-01-01 09:12:00 | 150    | 99.8   <- price at 09:10
+```
+
+**Key points:**
+- No exact time match needed
+- `strategy="backward"` - nearest earlier time
+- `strategy="forward"` - nearest later time
+- Essential for financial data, sensor readings
+
+## Multi-Key Joins
+
+Join on multiple columns for more precise matching:
+
+```python
+# Sales data with region
+sales = pl.DataFrame({
+    "date": ["2026-01-01", "2026-01-01", "2026-01-02"],
+    "region": ["North", "South", "North"],
+    "amount": [100, 200, 150]
+})
+
+# Targets by date and region
+targets = pl.DataFrame({
+    "date": ["2026-01-01", "2026-01-01", "2026-01-02"],
+    "region": ["North", "South", "North"],
+    "target": [120, 180, 140]
+})
+
+# Join on both date and region
+multi_join = sales.join(
+    targets,
+    on=["date", "region"],
+    how="left"
+).with_columns(
+    (pl.col("amount") - pl.col("target")).alias("variance")
+)
+
+print(multi_join)
+```
+
+## Join with Suffix
+
+When both tables have columns with same names (other than join keys):
+
+```python
+# Both tables have 'amount' column
+orders_with_price = pl.DataFrame({
+    "product": ["A", "B", "C"],
+    "amount": [100, 200, 300],  # order amount
+})
+
+products_with_cost = pl.DataFrame({
+    "product": ["A", "B", "C"],
+    "amount": [80, 150, 250],   # product cost
+})
+
+# Add suffix to distinguish columns
+result = orders_with_price.join(
+    products_with_cost,
+    on="product",
+    how="left",
+    suffix="_cost"  # right table columns get this suffix
+)
+
+print(result)
+# Columns: product, amount, amount_cost
+```
+
+## Practice Exercise
+
+You have three datasets for an e-commerce platform:
+
+```python
+import polars as pl
+from datetime import datetime
+
+# User registrations
+users = pl.DataFrame({
+    "user_id": [1, 2, 3, 4, 5],
+    "email": ["alice@example.com", "bob@example.com", 
+              "carol@example.com", "david@example.com", "eve@example.com"],
+    "signup_date": [datetime(2026, 1, 1), datetime(2026, 1, 5),
+                    datetime(2026, 1, 10), datetime(2026, 1, 15),
+                    datetime(2026, 1, 20)],
+})
+
+# Orders placed
+orders = pl.DataFrame({
+    "order_id": [101, 102, 103, 104, 105, 106],
+    "user_id": [1, 2, 1, 3, 99, 2],  # Note: user 99 doesn't exist
+    "order_date": [datetime(2026, 1, 5), datetime(2026, 1, 8),
+                   datetime(2026, 1, 12), datetime(2026, 1, 15),
+                   datetime(2026, 1, 18), datetime(2026, 1, 22)],
+    "total": [50.0, 75.5, 120.0, 30.0, 200.0, 45.0],
+})
+
+# Order items (some orders have multiple items)
+items = pl.DataFrame({
+    "order_id": [101, 101, 102, 103, 103, 103, 104, 105, 106],
+    "product": ["A", "B", "C", "A", "D", "E", "B", "F", "A"],
+    "quantity": [2, 1, 3, 1, 2, 1, 1, 5, 2],
+    "price": [20.0, 10.0, 25.0, 20.0, 30.0, 50.0, 10.0, 40.0, 20.0],
+})
+
+# Support tickets
+tickets = pl.DataFrame({
+    "ticket_id": [1, 2, 3],
+    "user_id": [1, 1, 99],  # User 99 doesn't exist
+    "issue": ["Refund", "Question", "Complaint"],
+})
+```
+
+**Tasks:**
+
+1. **Enrich Orders**: Create a report showing all orders with user email (left join). How many orders have no matching user?
+
+2. **Find Orphans**: Identify orders placed by non-existent users using anti join.
+
+3. **Active Users**: Find users who have placed at least one order (semi join). What percentage of registered users are active?
+
+4. **User Order Summary**: For each user, calculate: total orders, total spent, average order value. Include users with zero orders.
+
+5. **Order Items Aggregation**: Join orders with items and calculate: total items per order, verify order total matches sum(items).
+
+6. **Support Analysis**: Find users who have opened support tickets but never placed an order.
+
+7. **Time-Series Match**: Using the signup_date and order_date, find each user's first order time using asof join.
+
+<details>
+<summary>Click to see solutions</summary>
+
+```python
+# Task 1: Enrich orders with user emails
+enriched_orders = orders.join(
+    users.select("user_id", "email"),
+    on="user_id",
+    how="left"
+)
+print(f"Orders without matching user: {enriched_orders.filter(pl.col('email').is_null()).shape[0]}")
+
+# Task 2: Find orphan orders (anti join)
+orphan_orders = orders.join(
+    users.select("user_id"),
+    on="user_id",
+    how="anti"
+)
+print("Orphan orders:")
+print(orphan_orders)
+
+# Task 3: Active users (semi join)
+active_users = users.join(
+    orders.select("user_id").unique(),
+    on="user_id",
+    how="semi"
+)
+active_pct = len(active_users) / len(users) * 100
+print(f"Active users: {len(active_users)}/{len(users)} ({active_pct:.1f}%)")
+
+# Task 4: User order summary (groupby with left join for all users)
+user_summary = orders.group_by("user_id").agg([
+    pl.count().alias("total_orders"),
+    pl.col("total").sum().alias("total_spent"),
+    pl.col("total").mean().alias("avg_order_value"),
+]).join(
+    users.select("user_id", "email"),
+    on="user_id",
+    how="right"  # Keep all users even without orders
+).fill_null(0).select([
+    "user_id", "email", "total_orders", "total_spent", "avg_order_value"
+])
+print(user_summary)
+
+# Task 5: Verify order totals
+order_totals = items.group_by("order_id").agg(
+    pl.col("quantity").sum().alias("total_items"),
+    (pl.col("quantity") * pl.col("price")).sum().alias("calculated_total")
+).join(
+    orders.select("order_id", "total"),
+    on="order_id"
+).with_columns(
+    (pl.col("calculated_total") == pl.col("total")).alias("total_matches")
+)
+print(order_totals)
+
+# Task 6: Support tickets from users without orders
+ticket_only_users = tickets.join(
+    orders.select("user_id").unique(),
+    on="user_id",
+    how="anti"
+).join(users.select("user_id", "email"), on="user_id", how="left")
+print("Users with tickets but no orders:")
+print(ticket_only_users)
+
+# Task 7: First order time per user (asof join)
+user_first_order = users.join_asof(
+    orders.select("user_id", "order_date").sort("order_date"),
+    left_on="signup_date",
+    right_on="order_date",
+    by="user_id",
+    strategy="forward"
+).select([
+    "user_id", "email", "signup_date", "order_date"
+])
+print("User signup and first order:")
+print(user_first_order)
+```
+
+</details>
+
+## Resources
+
+- [Polars Join Documentation](https://docs.pola.rs/user-guide/transformations/joins/)
+- [AsOf Join Guide](https://docs.pola.rs/user-guide/transformations/time-series/asof_join/)
