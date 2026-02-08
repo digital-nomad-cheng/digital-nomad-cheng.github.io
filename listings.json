@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/100-days-of-polars/2026-02-08-day008-joins.html",
       "/posts/100-days-of-polars/2026-02-03-day007-datetime.html",
       "/posts/100-days-of-polars/2026-02-02-day006-data-integrity.html",
       "/posts/100-days-of-polars/2026-01-29-day005-structs.html",
