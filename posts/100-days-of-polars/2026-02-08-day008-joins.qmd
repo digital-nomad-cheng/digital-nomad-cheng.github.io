@@ -1,5 +1,5 @@
 ---
-title: "100 Days of Polars - Day 008: Mastering Joins - From Basic to Advanced"
+title: "100 Days of Polars - Day 008: Join"
 author: "NomadC"
 date: "2026-02-08"
 categories: [polars, data-engineering, joins, 100-days-of-polars]
