@@ -536,14 +536,28 @@
     "href": "about.html",
     "title": "About",
     "section": "",
-    "text": "I am a machine learning enginer with focus on computer vision and effcient machine learning solutions on edge based in Sweden.\nI mainly work with image related tasks nowadays from image signal processing, object detection/tracking/segmentation, face recognition systems."
+    "text": "I am a machine learning engineer with a focus on computer vision and efficient machine learning solutions on edge devices, based in Sweden.\nI mainly work with image-related tasks — from image signal processing, to object detection/tracking/segmentation, and face recognition systems."
+  },
+  {
+    "objectID": "about.html#about-me",
+    "href": "about.html#about-me",
+    "title": "About",
+    "section": "",
+    "text": "I am a machine learning engineer with a focus on computer vision and efficient machine learning solutions on edge devices, based in Sweden.\nI mainly work with image-related tasks — from image signal processing, to object detection/tracking/segmentation, and face recognition systems."
+  },
+  {
+    "objectID": "about.html#interests",
+    "href": "about.html#interests",
+    "title": "About",
+    "section": "Interests",
+    "text": "Interests\n\n🔭 Deep learning model optimization for edge deployment\n📷 Computer vision & image processing\n⚡ ML compilation & efficient inference\n🧠 Vision Transformers & attention mechanisms"
   },
   {
     "objectID": "posts/welcome/index.html",
     "href": "posts/welcome/index.html",
     "title": "Welcome To My Blog",
     "section": "",
-    "text": "This is the first post in a Quarto blog. Welcome!\n\nSince this post doesn’t specify an explicit image, the first image in the post will be used in the listing page of posts."
+    "text": "Welcome! I’m a machine learning engineer focused on computer vision and efficient ML on edge devices.\nThis blog is where I document my learning journey — from Vision Transformers and ML compilation to day-to-day engineering with tools like Polars, PyTorch, and TFLite."
   },
   {
     "objectID": "posts/100-days-of-polars/2026-01-17-day001-selectors.html",
@@ -844,34 +858,34 @@
     "href": "cv.html",
     "title": "Curriculum Vitae",
     "section": "",
-    "text": "June 2024 - Present\n\nBuilding computer vision solutions for edge devices"
+    "text": "📥 Download CV as PDF"
   },
   {
     "objectID": "cv.html#experience",
     "href": "cv.html#experience",
     "title": "Curriculum Vitae",
-    "section": "",
-    "text": "June 2024 - Present\n\nBuilding computer vision solutions for edge devices"
+    "section": "💼 Experience",
+    "text": "💼 Experience\n\nMachine Learning Engineer | Verisure Innovation AB\nJune 2024 – Present\n\nBuilding computer vision solutions for edge devices"
   },
   {
     "objectID": "cv.html#education",
     "href": "cv.html#education",
     "title": "Curriculum Vitae",
-    "section": "Education",
-    "text": "Education\n\nMaster’s Degree in High Performance Computing, Chalmers University of Technology, Sweden\nBachelor’s Degree in Electrical Engineering, Beijing Normal University, China"
+    "section": "🎓 Education",
+    "text": "🎓 Education\n\nMaster’s Degree\nHigh Performance Computing — Chalmers University of Technology, Sweden\n\n\nBachelor’s Degree\nElectrical Engineering — Beijing Normal University, China"
   },
   {
     "objectID": "cv.html#skills",
     "href": "cv.html#skills",
     "title": "Curriculum Vitae",
-    "section": "Skills",
-    "text": "Skills\n\nSpecilization: Digital Image Processing, Computer Vision, Object Detection, Object Segmentation, Edge Computing, Efficient ML\nTools: PyTorch/Keras/TensorFlow, TFLite/Micro\nProgramming Languages: Python/C++"
+    "section": "🛠️ Skills",
+    "text": "🛠️ Skills\n\n\n\n\n\n\n\nArea\nTechnologies\n\n\n\n\nSpecialization\nDigital Image Processing, Computer Vision, Object Detection, Object Segmentation, Edge Computing, Efficient ML\n\n\nFrameworks\nPyTorch, Keras, TensorFlow, TFLite/Micro, Apache TVM\n\n\nLanguages\nPython, C++"
   },
   {
     "objectID": "index.html",
     "href": "index.html",
     "title": "Blogs",
     "section": "",
-    "text": "100 Days of Polars - Day 009: Working with S3\n\n\n\n\n\n\npolars\n\n\ndata-engineering\n\n\ns3\n\n\ncloud\n\n\n100-days-of-polars\n\n\n\nHow to read, scan, and analyze Parquet data on S3 directly from Polars — with lazy evaluation, anonymous access, and streaming\n\n\n\n\n\nFeb 10, 2026\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\n100 Days of Polars - Day 008: Join\n\n\n\n\n\n\npolars\n\n\ndata-engineering\n\n\njoins\n\n\n100-days-of-polars\n\n\n\nComprehensive guide to all join types in Polars with practical examples\n\n\n\n\n\nFeb 8, 2026\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\n100 Days of Polars - Day 007: Date/Time — Parsing, Durations, and Time Zones\n\n\n\n\n\n\npolars\n\n\ndatetime\n\n\n100-days-of-polars\n\n\n\nPractical guide to parsing dates/times, working with durations, and handling time zones in Polars\n\n\n\n\n\nFeb 3, 2026\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\n100 Days of Polars - Day 006: Data Integrity - Handling Nulls and Schema Validation\n\n\n\n\n\n\npolars\n\n\ndata-engineering\n\n\n100-days-of-polars\n\n\n\nLearn to maintain data integrity in Polars through null handling techniques and schema validation strategies\n\n\n\n\n\nFeb 2, 2026\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\n100 Days of Polars - Day 005: Working with Structs - Nested Data Structures\n\n\n\n\n\n\npolars\n\n\ndata-engineering\n\n\n100-days-of-polars\n\n\n\nUnderstanding how to work with struct columns in Polars for hierarchical and nested data\n\n\n\n\n\nJan 29, 2026\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\n100 Days of Polars - Day 004: Working with Lists - explode, implode, and List Operations\n\n\n\n\n\n\npolars\n\n\ndata-engineering\n\n\n100-days-of-polars\n\n\n\nUnderstanding how to work with nested list data in Polars using explode, implode, and list operations\n\n\n\n\n\nJan 28, 2026\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\n100 Days of Polars - Day 003: map_elements vs map_batches vs Native Expressions\n\n\n\n\n\n\npolars\n\n\ndata-engineering\n\n\n100-days-of-polars\n\n\n\nUnderstanding when to use map_elements, map_batches, and native Polars expressions\n\n\n\n\n\nJan 19, 2026\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\n100 Days of Polars - Day 002: Window Functions\n\n\n\n\n\n\npolars\n\n\ndata-engineering\n\n\n100-days-of-polars\n\n\n\nMaster window functions in Polars for advanced data transformations\n\n\n\n\n\nJan 18, 2026\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\n100 Days of Polars - Day 001: Polars Selectors\n\n\n\n\n\n\npolars\n\n\ndata-engineering\n\n\n100-days-of-polars\n\n\n\nPolars selectors for efficient column selection\n\n\n\n\n\nJan 17, 2026\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\nDifference between TFLite Python API vs TFLite Micro Python API\n\n\n\n\n\n\ntflite\n\n\ntflite-micro\n\n\ncode\n\n\ntinyml\n\n\n\n\n\n\n\n\n\nAug 5, 2025\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\n\n\n\nnews\n\n\n\n\n\n\n\n\n\nAug 2, 2025\n\n\nTristan O’Malley\n\n\n\n\n\n\nNo matching items"
+    "text": "100 Days of Polars - Day 009: Working with S3\n\n\n\n\n\n\npolars\n\n\ndata-engineering\n\n\ns3\n\n\ncloud\n\n\n100-days-of-polars\n\n\n\nHow to read, scan, and analyze Parquet data on S3 directly from Polars — with lazy evaluation, anonymous access, and streaming\n\n\n\n\n\nFeb 10, 2026\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\n100 Days of Polars - Day 008: Join\n\n\n\n\n\n\npolars\n\n\ndata-engineering\n\n\njoins\n\n\n100-days-of-polars\n\n\n\nComprehensive guide to all join types in Polars with practical examples\n\n\n\n\n\nFeb 8, 2026\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\n100 Days of Polars - Day 007: Date/Time — Parsing, Durations, and Time Zones\n\n\n\n\n\n\npolars\n\n\ndatetime\n\n\n100-days-of-polars\n\n\n\nPractical guide to parsing dates/times, working with durations, and handling time zones in Polars\n\n\n\n\n\nFeb 3, 2026\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\n100 Days of Polars - Day 006: Data Integrity - Handling Nulls and Schema Validation\n\n\n\n\n\n\npolars\n\n\ndata-engineering\n\n\n100-days-of-polars\n\n\n\nLearn to maintain data integrity in Polars through null handling techniques and schema validation strategies\n\n\n\n\n\nFeb 2, 2026\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\n100 Days of Polars - Day 005: Working with Structs - Nested Data Structures\n\n\n\n\n\n\npolars\n\n\ndata-engineering\n\n\n100-days-of-polars\n\n\n\nUnderstanding how to work with struct columns in Polars for hierarchical and nested data\n\n\n\n\n\nJan 29, 2026\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\n100 Days of Polars - Day 004: Working with Lists - explode, implode, and List Operations\n\n\n\n\n\n\npolars\n\n\ndata-engineering\n\n\n100-days-of-polars\n\n\n\nUnderstanding how to work with nested list data in Polars using explode, implode, and list operations\n\n\n\n\n\nJan 28, 2026\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\n100 Days of Polars - Day 003: map_elements vs map_batches vs Native Expressions\n\n\n\n\n\n\npolars\n\n\ndata-engineering\n\n\n100-days-of-polars\n\n\n\nUnderstanding when to use map_elements, map_batches, and native Polars expressions\n\n\n\n\n\nJan 19, 2026\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\n100 Days of Polars - Day 002: Window Functions\n\n\n\n\n\n\npolars\n\n\ndata-engineering\n\n\n100-days-of-polars\n\n\n\nMaster window functions in Polars for advanced data transformations\n\n\n\n\n\nJan 18, 2026\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\n100 Days of Polars - Day 001: Polars Selectors\n\n\n\n\n\n\npolars\n\n\ndata-engineering\n\n\n100-days-of-polars\n\n\n\nPolars selectors for efficient column selection\n\n\n\n\n\nJan 17, 2026\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\nDifference between TFLite Python API vs TFLite Micro Python API\n\n\n\n\n\n\ntflite\n\n\ntflite-micro\n\n\ncode\n\n\ntinyml\n\n\n\n\n\n\n\n\n\nAug 5, 2025\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\n\n\n\nnews\n\n\n\n\n\n\n\n\n\nAug 2, 2025\n\n\nNomadC\n\n\n\n\n\n\nNo matching items"
   }
 ]
