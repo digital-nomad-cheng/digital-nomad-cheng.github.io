@@ -6,6 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="dcterms.date" content="2026-02-15">
 <meta name="description" content="From attention mechanisms to ViT, DETR, and SegFormer — implemented from scratch in PyTorch.">
 
 <title>Vision Transformers – Nomad’s Wonderland</title>
@@ -67,6 +68,9 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
 
 <link rel="stylesheet" href="../styles.css">
@@ -140,6 +144,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#detr-on-visdrone" id="toc-detr-on-visdrone" class="nav-link" data-scroll-target="#detr-on-visdrone">03 — DETR on VisDrone</a></li>
   <li><a href="#segformer-on-ade20k" id="toc-segformer-on-ade20k" class="nav-link" data-scroll-target="#segformer-on-ade20k">04 — SegFormer on ADE20K</a></li>
   </ul></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   <li><a href="#tech-stack" id="toc-tech-stack" class="nav-link" data-scroll-target="#tech-stack">Tech Stack</a></li>
   </ul>
 </nav>
@@ -150,7 +155,12 @@ ul.task-list li input[type="checkbox"] {
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <h1 class="title">Vision Transformers</h1>
-</div>
+  <div class="quarto-categories">
+    <div class="quarto-category">ViT</div>
+    <div class="quarto-category">Transformers</div>
+    <div class="quarto-category">PyTorch</div>
+  </div>
+  </div>
 
 <div>
   <div class="description">
@@ -162,6 +172,12 @@ ul.task-list li input[type="checkbox"] {
 <div class="quarto-title-meta">
 
     
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">February 15, 2026</p>
+    </div>
+  </div>
   
     
   </div>
@@ -173,28 +189,91 @@ ul.task-list li input[type="checkbox"] {
 
 <p>A hands-on study of Vision Transformers, progressing from foundational attention mechanisms to state-of-the-art architectures for classification, detection, and segmentation.</p>
 <p><strong>Repository:</strong> <a href="https://github.com/digital-nomad-cheng/vit">digital-nomad-cheng/vit</a></p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+    A["01 Attention"] --&gt; B["02 ViT"]
+    B --&gt; C["03 DETR"]
+    B --&gt; D["04 SegFormer"]
+
+    style A fill:#4a90d9,color:#fff
+    style B fill:#7b61ff,color:#fff
+    style C fill:#e06c75,color:#fff
+    style D fill:#56b6c2,color:#fff
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
 <section id="sub-projects" class="level2">
 <h2 class="anchored" data-anchor-id="sub-projects">Sub-projects</h2>
 <section id="transformer-attention" class="level3">
 <h3 class="anchored" data-anchor-id="transformer-attention">01 — Transformer Attention</h3>
 <p>Core multi-head self-attention and positional encoding, implemented from scratch in a Jupyter notebook. Covers the building blocks that power all subsequent projects.</p>
+<p>🔗 <a href="https://github.com/digital-nomad-cheng/vit/blob/main/01_transformer_attention.ipynb">View code</a></p>
 </section>
 <section id="vit-on-cifar-10" class="level3">
 <h3 class="anchored" data-anchor-id="vit-on-cifar-10">02 — ViT on CIFAR-10</h3>
 <p>Vision Transformer (ViT) image classification on CIFAR-10. Also includes a Transformer-in-Transformer (TNT) variant trained on MNIST, exploring nested tokenisation at both patch and pixel levels.</p>
+<p>🔗 <a href="https://github.com/digital-nomad-cheng/vit/tree/main/02_vit_cifar10">View code</a></p>
 </section>
 <section id="detr-on-visdrone" class="level3">
 <h3 class="anchored" data-anchor-id="detr-on-visdrone">03 — DETR on VisDrone</h3>
 <p>DEtection TRansformer (DETR) fine-tuned for aerial object detection on the VisDrone dataset. The architecture was rewritten to exactly match the official Facebook DETR implementation, enabling direct loading of pretrained weights and head-only fine-tuning for faster convergence.</p>
+<p>🔗 <a href="https://github.com/digital-nomad-cheng/vit/tree/main/03_detr_visdrone">View code</a></p>
 </section>
 <section id="segformer-on-ade20k" class="level3">
 <h3 class="anchored" data-anchor-id="segformer-on-ade20k">04 — SegFormer on ADE20K</h3>
 <p>SegFormer B0 semantic segmentation on ADE20K. Combines hierarchical Transformer encoders with lightweight MLP decoders for efficient dense prediction.</p>
+<p>🔗 <a href="https://github.com/digital-nomad-cheng/vit/tree/main/04_segformer_ade20k">View code</a></p>
 </section>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Paper</th>
+<th>Year</th>
+<th>Sub-project</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a> (Vaswani et al.)</td>
+<td>2017</td>
+<td>01</td>
+</tr>
+<tr class="even">
+<td><a href="https://arxiv.org/abs/2010.11929">An Image is Worth 16x16 Words</a> (Dosovitskiy et al.)</td>
+<td>2020</td>
+<td>02</td>
+</tr>
+<tr class="odd">
+<td><a href="https://arxiv.org/abs/2103.00112">Transformer in Transformer</a> (Han et al.)</td>
+<td>2021</td>
+<td>02</td>
+</tr>
+<tr class="even">
+<td><a href="https://arxiv.org/abs/2005.12872">End-to-End Object Detection with Transformers</a> (Carion et al.)</td>
+<td>2020</td>
+<td>03</td>
+</tr>
+<tr class="odd">
+<td><a href="https://arxiv.org/abs/2105.15203">SegFormer: Simple and Efficient Design for Semantic Segmentation</a> (Xie et al.)</td>
+<td>2021</td>
+<td>04</td>
+</tr>
+</tbody>
+</table>
 </section>
 <section id="tech-stack" class="level2">
 <h2 class="anchored" data-anchor-id="tech-stack">Tech Stack</h2>
-<p>Python · PyTorch · uv · Jupyter</p>
+<p>Python · PyTorch · uv ·</p>
 
 
 </section>

@@ -4,7 +4,7 @@
     "href": "projects.html",
     "title": "Projects",
     "section": "",
-    "text": "Vision Transformers\n\n\n\n\n\nFrom attention mechanisms to ViT, DETR, and SegFormer — implemented from scratch in PyTorch.\n\n\n\n\n\n\n\n\n\nNo matching items"
+    "text": "A collection of projects I’ve built to learn and experiment with deep learning, computer vision, and efficient ML.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nVision Transformers\n\n\n\n\n\n\nViT\n\n\nTransformers\n\n\nPyTorch\n\n\n\nFrom attention mechanisms to ViT, DETR, and SegFormer — implemented from scratch in PyTorch.\n\n\n\n\n\nFeb 15, 2026\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "AWS_CREDENTIALS_GUIDE.html",
@@ -788,21 +788,28 @@
     "href": "projects/vit.html",
     "title": "Vision Transformers",
     "section": "",
-    "text": "A hands-on study of Vision Transformers, progressing from foundational attention mechanisms to state-of-the-art architectures for classification, detection, and segmentation.\nRepository: digital-nomad-cheng/vit"
+    "text": "A hands-on study of Vision Transformers, progressing from foundational attention mechanisms to state-of-the-art architectures for classification, detection, and segmentation.\nRepository: digital-nomad-cheng/vit\nflowchart LR\n    A[\"01 Attention\"] --&gt; B[\"02 ViT\"]\n    B --&gt; C[\"03 DETR\"]\n    B --&gt; D[\"04 SegFormer\"]\n\n    style A fill:#4a90d9,color:#fff\n    style B fill:#7b61ff,color:#fff\n    style C fill:#e06c75,color:#fff\n    style D fill:#56b6c2,color:#fff"
   },
   {
     "objectID": "projects/vit.html#sub-projects",
     "href": "projects/vit.html#sub-projects",
     "title": "Vision Transformers",
     "section": "Sub-projects",
-    "text": "Sub-projects\n\n01 — Transformer Attention\nCore multi-head self-attention and positional encoding, implemented from scratch in a Jupyter notebook. Covers the building blocks that power all subsequent projects.\n\n\n02 — ViT on CIFAR-10\nVision Transformer (ViT) image classification on CIFAR-10. Also includes a Transformer-in-Transformer (TNT) variant trained on MNIST, exploring nested tokenisation at both patch and pixel levels.\n\n\n03 — DETR on VisDrone\nDEtection TRansformer (DETR) fine-tuned for aerial object detection on the VisDrone dataset. The architecture was rewritten to exactly match the official Facebook DETR implementation, enabling direct loading of pretrained weights and head-only fine-tuning for faster convergence.\n\n\n04 — SegFormer on ADE20K\nSegFormer B0 semantic segmentation on ADE20K. Combines hierarchical Transformer encoders with lightweight MLP decoders for efficient dense prediction."
+    "text": "Sub-projects\n\n01 — Transformer Attention\nCore multi-head self-attention and positional encoding, implemented from scratch in a Jupyter notebook. Covers the building blocks that power all subsequent projects.\n🔗 View code\n\n\n02 — ViT on CIFAR-10\nVision Transformer (ViT) image classification on CIFAR-10. Also includes a Transformer-in-Transformer (TNT) variant trained on MNIST, exploring nested tokenisation at both patch and pixel levels.\n🔗 View code\n\n\n03 — DETR on VisDrone\nDEtection TRansformer (DETR) fine-tuned for aerial object detection on the VisDrone dataset. The architecture was rewritten to exactly match the official Facebook DETR implementation, enabling direct loading of pretrained weights and head-only fine-tuning for faster convergence.\n🔗 View code\n\n\n04 — SegFormer on ADE20K\nSegFormer B0 semantic segmentation on ADE20K. Combines hierarchical Transformer encoders with lightweight MLP decoders for efficient dense prediction.\n🔗 View code"
+  },
+  {
+    "objectID": "projects/vit.html#references",
+    "href": "projects/vit.html#references",
+    "title": "Vision Transformers",
+    "section": "References",
+    "text": "References\n\n\n\nPaper\nYear\nSub-project\n\n\n\n\nAttention Is All You Need (Vaswani et al.)\n2017\n01\n\n\nAn Image is Worth 16x16 Words (Dosovitskiy et al.)\n2020\n02\n\n\nTransformer in Transformer (Han et al.)\n2021\n02\n\n\nEnd-to-End Object Detection with Transformers (Carion et al.)\n2020\n03\n\n\nSegFormer: Simple and Efficient Design for Semantic Segmentation (Xie et al.)\n2021\n04"
   },
   {
     "objectID": "projects/vit.html#tech-stack",
     "href": "projects/vit.html#tech-stack",
     "title": "Vision Transformers",
     "section": "Tech Stack",
-    "text": "Tech Stack\nPython · PyTorch · uv · Jupyter"
+    "text": "Tech Stack\nPython · PyTorch · uv ·"
   },
   {
     "objectID": "cv.html",

@@ -78,9 +78,9 @@ ul.task-list li input[type="checkbox"] {
     }
 
     const options = {
-      valueNames: ['listing-title','listing-author','listing-image','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
       
-      searchColumns: ["listing-title","listing-author","listing-image","listing-description"],
+      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
     };
 
     window['quarto-listings'] = window['quarto-listings'] || {};
@@ -184,14 +184,14 @@ window.Quarto = {
     </nav>
 </header>
 <!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         
-    </div>
+    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(1)</span></div><div class="category" data-category="UHlUb3JjaA==">PyTorch <span class="quarto-category-count">(1)</span></div><div class="category" data-category="VHJhbnNmb3JtZXJz">Transformers <span class="quarto-category-count">(1)</span></div><div class="category" data-category="VmlU">ViT <span class="quarto-category-count">(1)</span></div></div></div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
+<main class="content column-page-left" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -200,7 +200,7 @@ window.Quarto = {
 
 
 
-<div class="quarto-title-meta">
+<div class="quarto-title-meta column-page-left">
 
     
   
@@ -212,13 +212,14 @@ window.Quarto = {
 </header>
 
 
+<p>A collection of projects I’ve built to learn and experiment with deep learning, computer vision, and efficient ML.</p>
 
 
 
 
 <div class="quarto-listing quarto-listing-container-default" id="listing-listing">
 <div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-listing-file-modified-sort="1773082604009" data-listing-reading-time-sort="1" data-listing-word-count-sort="144">
+<div class="quarto-post image-right" data-index="0" data-categories="VmlUJTJDVHJhbnNmb3JtZXJzJTJDUHlUb3JjaA==" data-listing-date-sort="1771110000000" data-listing-file-modified-sort="1773085275470" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="273">
 <div class="thumbnail">
 <p><a href="./projects/vit.html" class="no-external"></a></p><a href="./projects/vit.html" class="no-external">
 <div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
@@ -231,12 +232,26 @@ window.Quarto = {
 <div class="listing-subtitle">
 <a href="./projects/vit.html" class="no-external"></a>
 </div>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('VmlU'); return false;">
+ViT
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('VHJhbnNmb3JtZXJz'); return false;">
+Transformers
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('UHlUb3JjaA=='); return false;">
+PyTorch
+</div>
+</div>
 <div class="listing-description">
 <a href="./projects/vit.html" class="no-external">From attention mechanisms to ViT, DETR, and SegFormer — implemented from scratch in PyTorch.</a>
 </div>
 </div>
 <div class="metadata">
-<p><a href="./projects/vit.html" class="no-external"></a></p><a href="./projects/vit.html" class="no-external">
+<a href="./projects/vit.html" class="no-external">
+<div class="listing-date">
+Feb 15, 2026
+</div>
 </a>
 </div>
 </div>
