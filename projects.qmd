@@ -3,7 +3,7 @@ title: "Projects"
 listing:
   contents: projects
   type: default
-  sort: false
+  sort: "date desc"
   categories: true
 page-layout: full
 ---
