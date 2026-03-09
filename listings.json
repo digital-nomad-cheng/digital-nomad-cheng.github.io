@@ -2,8 +2,8 @@
   {
     "listing": "/projects.html",
     "items": [
-      "/projects/ncnn-tvm.html",
-      "/projects/vit.html"
+      "/projects/vit.html",
+      "/projects/ncnn-tvm.html"
     ]
   },
   {
