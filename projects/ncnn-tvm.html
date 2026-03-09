@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="dcterms.date" content="2023-10-06">
+<meta name="description" content="Integrated Tencent’s ncnn inference engine into Apache TVM via BYOC, achieving 30% speedup over Arm Compute Library on Raspberry Pi 4B.">
 
-<title>day001-selectors – Nomad's Wonderland</title>
+<title>Integrating ncnn with Apache TVM – Nomad’s Wonderland</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,22 +25,22 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../../">
-<script src="../../site_libs/quarto-html/quarto.js"></script>
-<script src="../../site_libs/quarto-html/popper.min.js"></script>
-<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-863c515d4be54b18c75ead57ba7b0de2.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-863c515d4be54b18c75ead57ba7b0de2.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -66,19 +68,22 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
 
-<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="../styles.css">
 </head>
 
 <body class="nav-fixed">
 
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+  <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="../../index.html">
+    <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">Nomad’s Wonderland</span>
     </a>
   </div>
@@ -89,19 +94,19 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../../index.html"> 
+    <a class="nav-link" href="../index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../projects.html"> 
+    <a class="nav-link" href="../projects.html"> 
 <span class="menu-text">Projects</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../cv.html"> 
+    <a class="nav-link" href="../cv.html"> 
 <span class="menu-text">CV</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../about.html"> 
+    <a class="nav-link" href="../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
 </ul>
@@ -124,20 +129,167 @@ ul.task-list li input[type="checkbox"] {
     </nav>
 </header>
 <!-- content -->
-<header id="title-block-header" class="quarto-title-block"></header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#key-achievements" id="toc-key-achievements" class="nav-link active" data-scroll-target="#key-achievements">Key Achievements</a></li>
+  <li><a href="#implementation-details" id="toc-implementation-details" class="nav-link" data-scroll-target="#implementation-details">Implementation Details</a>
+  <ul class="collapse">
+  <li><a href="#supported-layer-fusions" id="toc-supported-layer-fusions" class="nav-link" data-scroll-target="#supported-layer-fusions">Supported Layer Fusions</a></li>
+  </ul></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  <li><a href="#tech-stack" id="toc-tech-stack" class="nav-link" data-scroll-target="#tech-stack">Tech Stack</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
-<main class="content quarto-banner-title-block" id="quarto-document-content">
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Integrating ncnn with Apache TVM</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">ML Compilation</div>
+    <div class="quarto-category">Edge AI</div>
+    <div class="quarto-category">C++</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    Integrated Tencent’s ncnn inference engine into Apache TVM via BYOC, achieving 30% speedup over Arm Compute Library on Raspberry Pi 4B.
+  </div>
+</div>
 
 
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">October 6, 2023</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
 
 
+</header>
 
 
+<p>A project course where I explored machine learning compilation by integrating <a href="https://github.com/tencent/ncnn">ncnn</a> — a high-performance inference engine for mobile — into <a href="https://tvm.apache.org/">Apache TVM</a> using its BYOC (Bring Your Own Codegen) framework.</p>
+<p><strong>Repository:</strong> <a href="https://github.com/digital-nomad-cheng/Integrate_ncnn_with_TVM">digital-nomad-cheng/Integrate_ncnn_with_TVM</a></p>
+<p>📄 <strong>Report:</strong> <a href="ncnn_apache_tvm.pdf">Project Course Report (PDF)</a></p>
+<section id="key-achievements" class="level2">
+<h2 class="anchored" data-anchor-id="key-achievements">Key Achievements</h2>
+<ul>
+<li><strong>Studied ML compilation theory</strong> — Relay IR, graph-level optimisations, and the TVM compilation pipeline.</li>
+<li><strong>Deep-dived into TVM BYOC</strong> — understood the annotation, partitioning, codegen, and runtime interfaces for plugging in external backends.</li>
+<li><strong>Generated efficient CUDA kernels</strong> using TVM’s auto-scheduling and tuning infrastructure.</li>
+<li><strong>Benchmarked multiple TVM codegens</strong> — compared execution time, memory footprint, and power consumption across backends.</li>
+<li><strong>Integrated ncnn as a new TVM backend</strong> via BYOC, implementing codegen and runtime modules in C++ for relay pattern matching, layer fusion, and memory-optimised dispatch.</li>
+<li><strong>Achieved ~31% speedup</strong> over Arm Compute Library on Raspberry Pi 4B (AlexNet, 227×227, 100 runs: ncnn 8.5s vs ACL 12.5s).</li>
+</ul>
+</section>
+<section id="implementation-details" class="level2">
+<h2 class="anchored" data-anchor-id="implementation-details">Implementation Details</h2>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+    A["Relay IR"] --&gt; B["Annotation &amp;\nPartitioning"]
+    B --&gt; C["ncnn Codegen\n(C++)"]
+    C --&gt; D["ncnn Runtime"]
+    D --&gt; E["Raspberry Pi 4B"]
+
+    style A fill:#6c5ce7,color:#fff
+    style B fill:#0984e3,color:#fff
+    style C fill:#00b894,color:#fff
+    style D fill:#fdcb6e,color:#333
+    style E fill:#e17055,color:#fff
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>The integration follows TVM’s BYOC pattern:</p>
+<ol type="1">
+<li><strong>Pattern matching</strong> — Relay graph patterns (e.g.&nbsp;<code>conv2d + bias_add + relu</code>) are annotated and partitioned for offloading to ncnn.</li>
+<li><strong>Codegen</strong> — A custom C++ codegen translates partitioned Relay subgraphs into ncnn layer configurations.</li>
+<li><strong>Runtime</strong> — A TVM-compatible runtime module allocates tensors at init time (not per-run) and dispatches computation to ncnn, reducing memory traffic.</li>
+</ol>
+<section id="supported-layer-fusions" class="level3">
+<h3 class="anchored" data-anchor-id="supported-layer-fusions">Supported Layer Fusions</h3>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Composite Pattern</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>nn.dense + bias_add</code></td>
+<td>✅</td>
+</tr>
+<tr class="even">
+<td><code>nn.dense + bias_add + relu</code></td>
+<td>✅</td>
+</tr>
+<tr class="odd">
+<td><code>nn.conv2d + bias_add + relu</code></td>
+<td>✅</td>
+</tr>
+<tr class="even">
+<td><code>reshape</code></td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Resource</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="https://tvm.apache.org/">Apache TVM</a></td>
+<td>Open deep learning compiler stack</td>
+</tr>
+<tr class="even">
+<td><a href="https://tvm.apache.org/docs/dev/how_to/relay_bring_your_own_codegen.html">TVM BYOC Documentation</a></td>
+<td>Official guide for integrating external codegens</td>
+</tr>
+<tr class="odd">
+<td><a href="https://github.com/tencent/ncnn">ncnn</a></td>
+<td>Tencent’s high-performance neural network inference engine for mobile</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="tech-stack" class="level2">
+<h2 class="anchored" data-anchor-id="tech-stack">Tech Stack</h2>
+<p>C++ · Python · Apache TVM (v0.13.0) · ncnn · Docker · Raspberry Pi 4B</p>
+
+
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -230,7 +382,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
+      var filterRegex = new RegExp("https:\/\/digital-nomad-cheng\.github\.io\/");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }

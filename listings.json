@@ -2,6 +2,7 @@
   {
     "listing": "/projects.html",
     "items": [
+      "/projects/ncnn-tvm.html",
       "/projects/vit.html"
     ]
   },
