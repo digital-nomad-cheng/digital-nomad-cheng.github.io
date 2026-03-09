@@ -1,12 +1,12 @@
 ---
 title: "Welcome To My Blog"
-author: "Tristan O'Malley"
+author: "NomadC"
 date: "2025-08-02"
 categories: [news]
 ---
 
-This is the first post in a Quarto blog. Welcome!
+Welcome! I'm a machine learning engineer focused on computer vision and efficient ML on edge devices.
+
+This blog is where I document my learning journey — from Vision Transformers and ML compilation to day-to-day engineering with tools like Polars, PyTorch, and TFLite.
 
 ![](thumbnail.jpg)
-
-Since this post doesn't specify an explicit `image`, the first image in the post will be used in the listing page of posts.

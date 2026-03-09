@@ -4,6 +4,9 @@ project:
 
 website:
   title: "Nomad's Wonderland"
+  favicon: favicon.png
+  open-graph: true
+  twitter-card: true
   navbar:
     left:
       - href: index.qmd
@@ -23,10 +26,7 @@ website:
 format:
   html:
     theme:
-      - cosmo
-      - brand
+      light: cosmo
+      dark: darkly
     css: styles.css
     toc: true
-
-
-

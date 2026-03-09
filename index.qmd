@@ -1,5 +1,6 @@
 ---
 title: "Blogs"
+subtitle: "Notes on computer vision, edge ML, and deep learning."
 listing:
   contents: posts
   sort: "date desc"
