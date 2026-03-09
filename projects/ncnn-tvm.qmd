@@ -1,0 +1,64 @@
+---
+title: "Integrating ncnn with Apache TVM"
+description: "Integrated Tencent's ncnn inference engine into Apache TVM via BYOC, achieving 30% speedup over Arm Compute Library on Raspberry Pi 4B."
+date: "2023-10-06"
+categories: [ML Compilation, Edge AI, C++]
+---
+
+A project course where I explored machine learning compilation by integrating [ncnn](https://github.com/tencent/ncnn) — a high-performance inference engine for mobile — into [Apache TVM](https://tvm.apache.org/) using its BYOC (Bring Your Own Codegen) framework.
+
+**Repository:** [digital-nomad-cheng/Integrate_ncnn_with_TVM](https://github.com/digital-nomad-cheng/Integrate_ncnn_with_TVM)
+
+📄 **Report:** [Project Course Report (PDF)](ncnn_apache_tvm.pdf)
+
+## Key Achievements
+
+- **Studied ML compilation theory** — Relay IR, graph-level optimisations, and the TVM compilation pipeline.
+- **Deep-dived into TVM BYOC** — understood the annotation, partitioning, codegen, and runtime interfaces for plugging in external backends.
+- **Generated efficient CUDA kernels** using TVM's auto-scheduling and tuning infrastructure.
+- **Benchmarked multiple TVM codegens** — compared execution time, memory footprint, and power consumption across backends.
+- **Integrated ncnn as a new TVM backend** via BYOC, implementing codegen and runtime modules in C++ for relay pattern matching, layer fusion, and memory-optimised dispatch.
+- **Achieved ~31% speedup** over Arm Compute Library on Raspberry Pi 4B (AlexNet, 227×227, 100 runs: ncnn 8.5s vs ACL 12.5s).
+
+## Implementation Details
+
+```{mermaid}
+flowchart LR
+    A["Relay IR"] --> B["Annotation &\nPartitioning"]
+    B --> C["ncnn Codegen\n(C++)"]
+    C --> D["ncnn Runtime"]
+    D --> E["Raspberry Pi 4B"]
+
+    style A fill:#6c5ce7,color:#fff
+    style B fill:#0984e3,color:#fff
+    style C fill:#00b894,color:#fff
+    style D fill:#fdcb6e,color:#333
+    style E fill:#e17055,color:#fff
+```
+
+The integration follows TVM's BYOC pattern:
+
+1. **Pattern matching** — Relay graph patterns (e.g. `conv2d + bias_add + relu`) are annotated and partitioned for offloading to ncnn.
+2. **Codegen** — A custom C++ codegen translates partitioned Relay subgraphs into ncnn layer configurations.
+3. **Runtime** — A TVM-compatible runtime module allocates tensors at init time (not per-run) and dispatches computation to ncnn, reducing memory traffic.
+
+### Supported Layer Fusions
+
+| Composite Pattern | Status |
+|---|---|
+| `nn.dense + bias_add` | ✅ |
+| `nn.dense + bias_add + relu` | ✅ |
+| `nn.conv2d + bias_add + relu` | ✅ |
+| `reshape` | ✅ |
+
+## References
+
+| Resource | Description |
+|---|---|
+| [Apache TVM](https://tvm.apache.org/) | Open deep learning compiler stack |
+| [TVM BYOC Documentation](https://tvm.apache.org/docs/dev/how_to/relay_bring_your_own_codegen.html) | Official guide for integrating external codegens |
+| [ncnn](https://github.com/tencent/ncnn) | Tencent's high-performance neural network inference engine for mobile |
+
+## Tech Stack
+
+C++ · Python · Apache TVM (v0.13.0) · ncnn · Docker · Raspberry Pi 4B
