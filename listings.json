@@ -1,7 +1,14 @@
 [
   {
+    "listing": "/projects.html",
+    "items": [
+      "/projects/vit.html"
+    ]
+  },
+  {
     "listing": "/index.html",
     "items": [
+      "/posts/100-days-of-polars/2026-02-10-day009-s3-integration.html",
       "/posts/100-days-of-polars/2026-02-08-day008-joins.html",
       "/posts/100-days-of-polars/2026-02-03-day007-datetime.html",
       "/posts/100-days-of-polars/2026-02-02-day006-data-integrity.html",
