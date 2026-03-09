@@ -1,0 +1,30 @@
+---
+title: "Vision Transformers"
+description: "From attention mechanisms to ViT, DETR, and SegFormer — implemented from scratch in PyTorch."
+---
+
+A hands-on study of Vision Transformers, progressing from foundational attention mechanisms to state-of-the-art architectures for classification, detection, and segmentation.
+
+**Repository:** [digital-nomad-cheng/vit](https://github.com/digital-nomad-cheng/vit)
+
+## Sub-projects
+
+### 01 — Transformer Attention
+
+Core multi-head self-attention and positional encoding, implemented from scratch in a Jupyter notebook. Covers the building blocks that power all subsequent projects.
+
+### 02 — ViT on CIFAR-10
+
+Vision Transformer (ViT) image classification on CIFAR-10. Also includes a Transformer-in-Transformer (TNT) variant trained on MNIST, exploring nested tokenisation at both patch and pixel levels.
+
+### 03 — DETR on VisDrone
+
+DEtection TRansformer (DETR) fine-tuned for aerial object detection on the VisDrone dataset. The architecture was rewritten to exactly match the official Facebook DETR implementation, enabling direct loading of pretrained weights and head-only fine-tuning for faster convergence.
+
+### 04 — SegFormer on ADE20K
+
+SegFormer B0 semantic segmentation on ADE20K. Combines hierarchical Transformer encoders with lightweight MLP decoders for efficient dense prediction.
+
+## Tech Stack
+
+Python · PyTorch · uv · Jupyter
