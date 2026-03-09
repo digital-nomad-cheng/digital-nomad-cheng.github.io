@@ -1,11 +1,25 @@
 ---
 title: "Vision Transformers"
 description: "From attention mechanisms to ViT, DETR, and SegFormer — implemented from scratch in PyTorch."
+date: "2026-02-15"
+categories: [ViT, Transformers, PyTorch]
 ---
 
 A hands-on study of Vision Transformers, progressing from foundational attention mechanisms to state-of-the-art architectures for classification, detection, and segmentation.
 
 **Repository:** [digital-nomad-cheng/vit](https://github.com/digital-nomad-cheng/vit)
+
+```{mermaid}
+flowchart LR
+    A["01 Attention"] --> B["02 ViT"]
+    B --> C["03 DETR"]
+    B --> D["04 SegFormer"]
+
+    style A fill:#4a90d9,color:#fff
+    style B fill:#7b61ff,color:#fff
+    style C fill:#e06c75,color:#fff
+    style D fill:#56b6c2,color:#fff
+```
 
 ## Sub-projects
 
@@ -13,18 +27,36 @@ A hands-on study of Vision Transformers, progressing from foundational attention
 
 Core multi-head self-attention and positional encoding, implemented from scratch in a Jupyter notebook. Covers the building blocks that power all subsequent projects.
 
+🔗 [View code](https://github.com/digital-nomad-cheng/vit/blob/main/01_transformer_attention.ipynb)
+
 ### 02 — ViT on CIFAR-10
 
 Vision Transformer (ViT) image classification on CIFAR-10. Also includes a Transformer-in-Transformer (TNT) variant trained on MNIST, exploring nested tokenisation at both patch and pixel levels.
+
+🔗 [View code](https://github.com/digital-nomad-cheng/vit/tree/main/02_vit_cifar10)
 
 ### 03 — DETR on VisDrone
 
 DEtection TRansformer (DETR) fine-tuned for aerial object detection on the VisDrone dataset. The architecture was rewritten to exactly match the official Facebook DETR implementation, enabling direct loading of pretrained weights and head-only fine-tuning for faster convergence.
 
+🔗 [View code](https://github.com/digital-nomad-cheng/vit/tree/main/03_detr_visdrone)
+
 ### 04 — SegFormer on ADE20K
 
 SegFormer B0 semantic segmentation on ADE20K. Combines hierarchical Transformer encoders with lightweight MLP decoders for efficient dense prediction.
 
+🔗 [View code](https://github.com/digital-nomad-cheng/vit/tree/main/04_segformer_ade20k)
+
+## References
+
+| Paper | Year | Sub-project |
+|---|---|---|
+| [Attention Is All You Need](https://arxiv.org/abs/1706.03762) (Vaswani et al.) | 2017 | 01 |
+| [An Image is Worth 16x16 Words](https://arxiv.org/abs/2010.11929) (Dosovitskiy et al.) | 2020 | 02 |
+| [Transformer in Transformer](https://arxiv.org/abs/2103.00112) (Han et al.) | 2021 | 02 |
+| [End-to-End Object Detection with Transformers](https://arxiv.org/abs/2005.12872) (Carion et al.) | 2020 | 03 |
+| [SegFormer: Simple and Efficient Design for Semantic Segmentation](https://arxiv.org/abs/2105.15203) (Xie et al.) | 2021 | 04 |
+
 ## Tech Stack
 
-Python · PyTorch · uv · Jupyter
+Python · PyTorch · uv · 

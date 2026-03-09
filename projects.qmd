@@ -4,4 +4,8 @@ listing:
   contents: projects
   type: default
   sort: false
+  categories: true
+page-layout: full
 ---
+
+A collection of projects I've built to learn and experiment with deep learning, computer vision, and efficient ML.
