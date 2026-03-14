@@ -3,6 +3,7 @@
     "listing": "/projects.html",
     "items": [
       "/projects/vit.html",
+      "/projects/computational-photography.html",
       "/projects/ncnn-tvm.html"
     ]
   },
