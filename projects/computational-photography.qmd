@@ -19,12 +19,13 @@ A project exploring computational photography and high-performance image process
 
 ## Implementations
 
-The project comprises various classical algorithms and operations:
+The project comprises various classical algorithms and operations, implemented both in pure C++ and optimized using Halide:
 
-- **Filtering:** Box Blur, Laplacian, and Median filters.
+- **Computational Photography:** High Dynamic Range (HDR) Imaging, Panorama Stitching, Image Alignment, Image Demosaicing, and Image Morphing.
+- **Image Warping:** Homography estimation and geometric transformations.
+- **Filtering & Convolution:** Box Blur, Laplacian, Median filters, and Sobel edge detection.
 - **Color Operations:** Color Balance, RGB to BGR conversion, and sRGB to linear RGB transformations.
-- **Integration:** seamless integration of Halide routines with OpenCV for robust end-to-end processing.
-- **Scheduling Strategies:** Explored Halide's powerful schedule primitives to optimize execution times across different hardware targets.
+- **Integration & Optimization:** Seamless integration of Halide routines with OpenCV, and exploring Halide's schedule primitives to optimize execution times across different hardware targets.
 
 ## Tech Stack
 
