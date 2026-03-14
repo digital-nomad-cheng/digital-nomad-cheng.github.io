@@ -1,0 +1,31 @@
+---
+title: "Computational Photography with Halide"
+description: "Implementation of image processing pipelines and computational photography algorithms using the Halide domain-specific language."
+date: "2024-05-15"
+categories: [Computational Photography, Halide, C++]
+---
+
+A project exploring computational photography and high-performance image processing using [Halide](https://halide-lang.org/), a domain-specific language designed to make it easier to write high-performance image processing code. The project includes solutions for the MIT course 6.815/6.865 (Digital & Computational Photography) and a standalone repository containing various image processing algorithms.
+
+**Repositories:** 
+- [digital-nomad-cheng/MIT-6.815](https://github.com/digital-nomad-cheng/MIT-6.815)
+- [digital-nomad-cheng/Halide_Image_Process](https://github.com/digital-nomad-cheng/Halide_Image_Process)
+
+## Key Learning Outcomes
+
+1. **Halide DSL:** Gained hands-on experience in writing fast, portable image processing code with Halide.
+2. **C++ Image Processing Library:** Implemented a comprehensive library of image processing algorithms from scratch using C++.
+3. **ISP Pipelines:** Explored the intricacies of Image Signal Processing (ISP) pipelines and their optimization.
+
+## Implementations
+
+The project comprises various classical algorithms and operations:
+
+- **Filtering:** Box Blur, Laplacian, and Median filters.
+- **Color Operations:** Color Balance, RGB to BGR conversion, and sRGB to linear RGB transformations.
+- **Integration:** seamless integration of Halide routines with OpenCV for robust end-to-end processing.
+- **Scheduling Strategies:** Explored Halide's powerful schedule primitives to optimize execution times across different hardware targets.
+
+## Tech Stack
+
+C++ · Halide · OpenCV
