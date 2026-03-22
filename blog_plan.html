@@ -6,10 +6,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2023-10-06">
-<meta name="description" content="Integrated Tencent’s ncnn inference engine into Apache TVM via BYOC, achieving 30% speedup over Arm Compute Library on Raspberry Pi 4B.">
 
-<title>Integrating ncnn with Apache TVM – Nomad’s Wonderland</title>
+<title>blog_plan – Nomad's Wonderland</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -22,28 +20,62 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../">
-<link href="../favicon.png" rel="icon" type="image/png">
-<script src="../site_libs/quarto-html/quarto.js"></script>
-<script src="../site_libs/quarto-html/popper.min.js"></script>
-<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-b53751a350365c71b6c909e95f209ed1.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-863c515d4be54b18c75ead57ba7b0de2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark-72d3f41041cee2253cddee09417ee136.min.css" rel="prefetch" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./favicon.png" rel="icon" type="image/png">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-b53751a350365c71b6c909e95f209ed1.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-863c515d4be54b18c75ead57ba7b0de2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark-72d3f41041cee2253cddee09417ee136.min.css" rel="prefetch" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -71,17 +103,12 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
-<script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
-<link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
 
-<link rel="stylesheet" href="../styles.css">
-<meta property="og:title" content="Integrating ncnn with Apache TVM – Nomad’s Wonderland">
-<meta property="og:description" content="Integrated Tencent’s ncnn inference engine into Apache TVM via BYOC, achieving 30% speedup over Arm Compute Library on Raspberry Pi 4B.">
+<link rel="stylesheet" href="styles.css">
+<meta property="og:title" content="Nomad’s Wonderland">
 <meta property="og:site_name" content="Nomad's Wonderland">
-<meta name="twitter:title" content="Integrating ncnn with Apache TVM – Nomad’s Wonderland">
-<meta name="twitter:description" content="Integrated Tencent’s ncnn inference engine into Apache TVM via BYOC, achieving 30% speedup over Arm Compute Library on Raspberry Pi 4B.">
+<meta name="twitter:title" content="Nomad’s Wonderland">
 <meta name="twitter:card" content="summary">
 </head>
 
@@ -92,7 +119,7 @@ ul.task-list li input[type="checkbox"] {
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="../index.html">
+    <a class="navbar-brand" href="./index.html">
     <span class="navbar-title">Nomad’s Wonderland</span>
     </a>
   </div>
@@ -103,27 +130,27 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../index.html"> 
+    <a class="nav-link" href="./index.html"> 
 <span class="menu-text">Latest</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../projects.html"> 
+    <a class="nav-link" href="./projects.html"> 
 <span class="menu-text">Projects</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../series/tutorials/index.html"> 
+    <a class="nav-link" href="./series/tutorials/index.html"> 
 <span class="menu-text">Tutorials</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../series/notes/index.html"> 
+    <a class="nav-link" href="./series/notes/index.html"> 
 <span class="menu-text">Notes</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../cv.html"> 
+    <a class="nav-link" href="./cv.html"> 
 <span class="menu-text">CV</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../about.html"> 
+    <a class="nav-link" href="./about.html"> 
 <span class="menu-text">About Me</span></a>
   </li>  
 </ul>
@@ -155,158 +182,260 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#key-achievements" id="toc-key-achievements" class="nav-link active" data-scroll-target="#key-achievements">Key Achievements</a></li>
-  <li><a href="#implementation-details" id="toc-implementation-details" class="nav-link" data-scroll-target="#implementation-details">Implementation Details</a>
+  <li><a href="#blog-post-plan-the-silent-killer-how-relu-murdered-my-bounding-boxes" id="toc-blog-post-plan-the-silent-killer-how-relu-murdered-my-bounding-boxes" class="nav-link active" data-scroll-target="#blog-post-plan-the-silent-killer-how-relu-murdered-my-bounding-boxes">Blog Post Plan: The Silent Killer — How ReLU Murdered My Bounding Boxes</a>
   <ul class="collapse">
-  <li><a href="#supported-layer-fusions" id="toc-supported-layer-fusions" class="nav-link" data-scroll-target="#supported-layer-fusions">Supported Layer Fusions</a></li>
+  <li><a href="#hook" id="toc-hook" class="nav-link" data-scroll-target="#hook">Hook</a></li>
+  <li><a href="#the-setup-200-words" id="toc-the-setup-200-words" class="nav-link" data-scroll-target="#the-setup-200-words">1. The Setup (~200 words)</a></li>
+  <li><a href="#the-symptom-150-words-images" id="toc-the-symptom-150-words-images" class="nav-link" data-scroll-target="#the-symptom-150-words-images">2. The Symptom (~150 words + images)</a>
+  <ul class="collapse">
+  <li><a href="#reproduction-steps" id="toc-reproduction-steps" class="nav-link" data-scroll-target="#reproduction-steps">Reproduction Steps</a></li>
   </ul></li>
-  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
-  <li><a href="#tech-stack" id="toc-tech-stack" class="nav-link" data-scroll-target="#tech-stack">Tech Stack</a></li>
+  <li><a href="#the-investigation-400-words" id="toc-the-investigation-400-words" class="nav-link" data-scroll-target="#the-investigation-400-words">3. The Investigation (~400 words)</a>
+  <ul class="collapse">
+  <li><a href="#step-1-verify-the-decode-logic" id="toc-step-1-verify-the-decode-logic" class="nav-link" data-scroll-target="#step-1-verify-the-decode-logic">Step 1: Verify the decode logic</a></li>
+  <li><a href="#step-2-dump-raw-predictions" id="toc-step-2-dump-raw-predictions" class="nav-link" data-scroll-target="#step-2-dump-raw-predictions">Step 2: Dump raw predictions</a></li>
+  <li><a href="#step-3-inspect-the-weights" id="toc-step-3-inspect-the-weights" class="nav-link" data-scroll-target="#step-3-inspect-the-weights">Step 3: Inspect the weights</a></li>
+  </ul></li>
+  <li><a href="#the-root-cause-300-words" id="toc-the-root-cause-300-words" class="nav-link" data-scroll-target="#the-root-cause-300-words">4. The Root Cause (~300 words)</a>
+  <ul class="collapse">
+  <li><a href="#the-dead-relu-problem" id="toc-the-dead-relu-problem" class="nav-link" data-scroll-target="#the-dead-relu-problem">The Dead ReLU Problem</a></li>
+  <li><a href="#why-did-it-work-in-the-original-ttfnet" id="toc-why-did-it-work-in-the-original-ttfnet" class="nav-link" data-scroll-target="#why-did-it-work-in-the-original-ttfnet">Why did it work in the original TTFNet?</a></li>
+  <li><a href="#diagram-gradient-flow-through-relu" id="toc-diagram-gradient-flow-through-relu" class="nav-link" data-scroll-target="#diagram-gradient-flow-through-relu">Diagram: Gradient Flow Through ReLU</a></li>
+  </ul></li>
+  <li><a href="#three-fixes-300-words" id="toc-three-fixes-300-words" class="nav-link" data-scroll-target="#three-fixes-300-words">5. Three Fixes (~300 words)</a>
+  <ul class="collapse">
+  <li><a href="#fix-a-leaky-relu-activation-swap" id="toc-fix-a-leaky-relu-activation-swap" class="nav-link" data-scroll-target="#fix-a-leaky-relu-activation-swap">Fix A: Leaky ReLU (activation swap)</a></li>
+  <li><a href="#fix-b-positive-bias-initialization-init-fix" id="toc-fix-b-positive-bias-initialization-init-fix" class="nav-link" data-scroll-target="#fix-b-positive-bias-initialization-init-fix">Fix B: Positive bias initialization (init fix)</a></li>
+  <li><a href="#fix-c-softplus-smooth-activation" id="toc-fix-c-softplus-smooth-activation" class="nav-link" data-scroll-target="#fix-c-softplus-smooth-activation">Fix C: Softplus (smooth activation)</a></li>
+  <li><a href="#comparison-table" id="toc-comparison-table" class="nav-link" data-scroll-target="#comparison-table">Comparison Table</a></li>
+  </ul></li>
+  <li><a href="#the-broader-lesson-200-words" id="toc-the-broader-lesson-200-words" class="nav-link" data-scroll-target="#the-broader-lesson-200-words">6. The Broader Lesson (~200 words)</a></li>
+  <li><a href="#bonus-a-pytorch-lightning-callback-for-early-detection-100-words" id="toc-bonus-a-pytorch-lightning-callback-for-early-detection-100-words" class="nav-link" data-scroll-target="#bonus-a-pytorch-lightning-callback-for-early-detection-100-words">7. Bonus: A PyTorch Lightning Callback for Early Detection (~100 words)</a></li>
+  <li><a href="#metadata" id="toc-metadata" class="nav-link" data-scroll-target="#metadata">Metadata</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
-
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">Integrating ncnn with Apache TVM</h1>
-  <div class="quarto-categories">
-    <div class="quarto-category">ML Compilation</div>
-    <div class="quarto-category">Edge AI</div>
-    <div class="quarto-category">C++</div>
-  </div>
-  </div>
-
-<div>
-  <div class="description">
-    Integrated Tencent’s ncnn inference engine into Apache TVM via BYOC, achieving 30% speedup over Arm Compute Library on Raspberry Pi 4B.
-  </div>
-</div>
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
 
 
-<div class="quarto-title-meta">
-
-    
-    <div>
-    <div class="quarto-title-meta-heading">Published</div>
-    <div class="quarto-title-meta-contents">
-      <p class="date">October 6, 2023</p>
-    </div>
-  </div>
-  
-    
-  </div>
-  
 
 
-</header>
-
-
-<p>A project course where I explored machine learning compilation by integrating <a href="https://github.com/tencent/ncnn">ncnn</a> — a high-performance inference engine for mobile — into <a href="https://tvm.apache.org/">Apache TVM</a> using its BYOC (Bring Your Own Codegen) framework.</p>
-<p><strong>Repository:</strong> <a href="https://github.com/digital-nomad-cheng/Integrate_ncnn_with_TVM">digital-nomad-cheng/Integrate_ncnn_with_TVM</a></p>
-<p>📄 <strong>Report:</strong> <a href="ncnn_apache_tvm.pdf">Project Course Report (PDF)</a></p>
-<section id="key-achievements" class="level2">
-<h2 class="anchored" data-anchor-id="key-achievements">Key Achievements</h2>
+<section id="blog-post-plan-the-silent-killer-how-relu-murdered-my-bounding-boxes" class="level1">
+<h1>Blog Post Plan: The Silent Killer — How ReLU Murdered My Bounding Boxes</h1>
+<section id="hook" class="level2">
+<h2 class="anchored" data-anchor-id="hook">Hook</h2>
+<p>A single dead neuron in a 4-channel output head caused every bounding box to lose its left edge. The model trained for hours, the loss converged, and inference produced confident detections — but every box only covered the right half of each person. Here’s how I found it, why it happened, and three ways to prevent it.</p>
+</section>
+<section id="the-setup-200-words" class="level2">
+<h2 class="anchored" data-anchor-id="the-setup-200-words">1. The Setup (~200 words)</h2>
 <ul>
-<li><strong>Studied ML compilation theory</strong> — Relay IR, graph-level optimisations, and the TVM compilation pipeline.</li>
-<li><strong>Deep-dived into TVM BYOC</strong> — understood the annotation, partitioning, codegen, and runtime interfaces for plugging in external backends.</li>
-<li><strong>Generated efficient CUDA kernels</strong> using TVM’s auto-scheduling and tuning infrastructure.</li>
-<li><strong>Benchmarked multiple TVM codegens</strong> — compared execution time, memory footprint, and power consumption across backends.</li>
-<li><strong>Integrated ncnn as a new TVM backend</strong> via BYOC, implementing codegen and runtime modules in C++ for relay pattern matching, layer fusion, and memory-optimised dispatch.</li>
-<li><strong>Achieved ~31% speedup</strong> over Arm Compute Library on Raspberry Pi 4B (AlexNet, 227×227, 100 runs: ncnn 8.5s vs ACL 12.5s).</li>
+<li>What is TTFNet? Anchor-free detector, heatmap + 4-channel offset regression (left, top, right, bottom)</li>
+<li>The lightweight twist: using MobileNetV3-Small instead of the original ResNet-18 + Deformable Conv backbone</li>
+<li>The offset head: <code>wh = F.relu(wh_head(x)) * wh_offset_base</code></li>
+<li>Why ReLU? Offsets are distances from center to edges — should always be positive</li>
 </ul>
 </section>
-<section id="implementation-details" class="level2">
-<h2 class="anchored" data-anchor-id="implementation-details">Implementation Details</h2>
-<div class="cell" data-layout-align="default">
-<div class="cell-output-display">
-<div>
-<p></p><figure class="figure"><p></p>
-<div>
-<pre class="mermaid mermaid-js">flowchart LR
-    A["Relay IR"] --&gt; B["Annotation &amp;\nPartitioning"]
-    B --&gt; C["ncnn Codegen\n(C++)"]
-    C --&gt; D["ncnn Runtime"]
-    D --&gt; E["Raspberry Pi 4B"]
-
-    style A fill:#6c5ce7,color:#fff
-    style B fill:#0984e3,color:#fff
-    style C fill:#00b894,color:#fff
-    style D fill:#fdcb6e,color:#333
-    style E fill:#e17055,color:#fff
-</pre>
-</div>
-<p></p></figure><p></p>
-</div>
-</div>
-</div>
-<p>The integration follows TVM’s BYOC pattern:</p>
-<ol type="1">
-<li><strong>Pattern matching</strong> — Relay graph patterns (e.g.&nbsp;<code>conv2d + bias_add + relu</code>) are annotated and partitioned for offloading to ncnn.</li>
-<li><strong>Codegen</strong> — A custom C++ codegen translates partitioned Relay subgraphs into ncnn layer configurations.</li>
-<li><strong>Runtime</strong> — A TVM-compatible runtime module allocates tensors at init time (not per-run) and dispatches computation to ncnn, reducing memory traffic.</li>
-</ol>
-<section id="supported-layer-fusions" class="level3">
-<h3 class="anchored" data-anchor-id="supported-layer-fusions">Supported Layer Fusions</h3>
+<section id="the-symptom-150-words-images" class="level2">
+<h2 class="anchored" data-anchor-id="the-symptom-150-words-images">2. The Symptom (~150 words + images)</h2>
+<ul>
+<li>Show the broken inference result (boxes only covering right half of people)</li>
+<li>“The model is confident and boxes are at the right locations… but they’re all too narrow”</li>
+<li>Initial suspicion: decoding bug? scale mismatch? wrong channel order?</li>
+</ul>
+<section id="reproduction-steps" class="level3">
+<h3 class="anchored" data-anchor-id="reproduction-steps">Reproduction Steps</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone <span class="op">&lt;</span>repo<span class="op">&gt;</span> <span class="kw">&amp;&amp;</span> <span class="bu">cd</span> ttfnet</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> checkout dead-relu-demo  <span class="co"># branch with the original bug</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> sync</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">./run.sh</span>  <span class="co"># download dataset + train</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># After ~5 epochs, run inference:</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run python eval.py <span class="at">--checkpoint</span> checkpoints/ttfnet-epoch=05-<span class="pp">*</span>.ckpt <span class="at">--image</span> WiderPerson/Images/000089.jpg</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Observe: boxes only cover right half of objects</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="the-investigation-400-words" class="level2">
+<h2 class="anchored" data-anchor-id="the-investigation-400-words">3. The Investigation (~400 words)</h2>
+<section id="step-1-verify-the-decode-logic" class="level3">
+<h3 class="anchored" data-anchor-id="step-1-verify-the-decode-logic">Step 1: Verify the decode logic</h3>
+<ul>
+<li>Trace <a href="file:///home/vincent/repos/ttfnet/model.py#129-196">get_bboxes</a>: <code>x1 = center_x - wh[0]</code>, <code>x2 = center_x + wh[2]</code></li>
+<li>Compare against original TTFNet source — identical</li>
+<li>Compare against training loss computation — consistent</li>
+<li><strong>Conclusion: decode is correct</strong></li>
+</ul>
+</section>
+<section id="step-2-dump-raw-predictions" class="level3">
+<h3 class="anchored" data-anchor-id="step-2-dump-raw-predictions">Step 2: Dump raw predictions</h3>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Debug script output:</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>wh channel <span class="dv">0</span> (left):   <span class="bu">min</span><span class="op">=</span><span class="fl">0.000</span>, <span class="bu">max</span><span class="op">=</span><span class="fl">0.000</span>, mean<span class="op">=</span><span class="fl">0.000</span>  ← DEAD<span class="op">!</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>wh channel <span class="dv">1</span> (top):    <span class="bu">min</span><span class="op">=</span><span class="fl">7.1</span>,   <span class="bu">max</span><span class="op">=</span><span class="fl">210.1</span>, mean<span class="op">=</span><span class="fl">73.4</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>wh channel <span class="dv">2</span> (right):  <span class="bu">min</span><span class="op">=</span><span class="fl">5.0</span>,   <span class="bu">max</span><span class="op">=</span><span class="fl">67.4</span>,  mean<span class="op">=</span><span class="fl">26.5</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>wh channel <span class="dv">3</span> (bottom): <span class="bu">min</span><span class="op">=</span><span class="fl">12.5</span>,  <span class="bu">max</span><span class="op">=</span><span class="fl">225.2</span>, mean<span class="op">=</span><span class="fl">59.7</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>Channel 0 is always exactly zero → <code>x1 = center_x - 0 = center_x</code></li>
+<li>That’s why boxes start at center and extend only right</li>
+</ul>
+</section>
+<section id="step-3-inspect-the-weights" class="level3">
+<h3 class="anchored" data-anchor-id="step-3-inspect-the-weights">Step 3: Inspect the weights</h3>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>Channel <span class="dv">0</span>: weight std<span class="op">=</span><span class="fl">0.0004</span>, bias<span class="op">=-</span><span class="fl">0.004</span>  ← never learned</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>Channel <span class="dv">1</span>: weight std<span class="op">=</span><span class="fl">0.221</span>,  bias<span class="op">=</span><span class="fl">0.660</span>   ← healthy</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>Channel <span class="dv">2</span>: weight std<span class="op">=</span><span class="fl">0.083</span>,  bias<span class="op">=</span><span class="fl">0.518</span>   ← healthy</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>Channel <span class="dv">3</span>: weight std<span class="op">=</span><span class="fl">0.215</span>,  bias<span class="op">=</span><span class="fl">0.902</span>   ← healthy</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="the-root-cause-300-words" class="level2">
+<h2 class="anchored" data-anchor-id="the-root-cause-300-words">4. The Root Cause (~300 words)</h2>
+<section id="the-dead-relu-problem" class="level3">
+<h3 class="anchored" data-anchor-id="the-dead-relu-problem">The Dead ReLU Problem</h3>
+<ul>
+<li>Initialization: <code>normal_init(std=0.001)</code> → weights ≈ 0, bias = 0</li>
+<li>Pre-activation output hovers around 0</li>
+<li>If channel 0 drifts slightly negative early in training → ReLU clips to 0 → gradient = 0 → <strong>permanently dead</strong></li>
+<li>Classic “dying ReLU” problem, but manifesting at the <em>output channel</em> level</li>
+</ul>
+</section>
+<section id="why-did-it-work-in-the-original-ttfnet" class="level3">
+<h3 class="anchored" data-anchor-id="why-did-it-work-in-the-original-ttfnet">Why did it work in the original TTFNet?</h3>
+<ul>
+<li>Original uses ResNet-18 backbone + Modulated Deformable Convolutions → richer features, stronger gradients</li>
+<li>MobileNetV3-Small produces weaker features → more prone to dead neurons in downstream heads</li>
+<li>It’s a <strong>training dynamics</strong> issue, not a math issue — the architecture is correct</li>
+</ul>
+</section>
+<section id="diagram-gradient-flow-through-relu" class="level3">
+<h3 class="anchored" data-anchor-id="diagram-gradient-flow-through-relu">Diagram: Gradient Flow Through ReLU</h3>
+<pre><code>Pre-activation: -0.002 (slightly negative due to random init)
+         ↓
+     ReLU(x) = 0
+         ↓
+   Gradient = 0 (no learning signal)
+         ↓
+   Weight stays near 0 forever
+         ↓
+   Channel is dead ☠️</code></pre>
+</section>
+</section>
+<section id="three-fixes-300-words" class="level2">
+<h2 class="anchored" data-anchor-id="three-fixes-300-words">5. Three Fixes (~300 words)</h2>
+<section id="fix-a-leaky-relu-activation-swap" class="level3">
+<h3 class="anchored" data-anchor-id="fix-a-leaky-relu-activation-swap">Fix A: Leaky ReLU (activation swap)</h3>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>wh <span class="op">=</span> F.leaky_relu(<span class="va">self</span>.wh_head(x)) <span class="op">*</span> Config.wh_offset_base</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>Allows 1% gradient for negative values</li>
+<li>Offsets can go slightly negative, but downstream clamp handles it</li>
+<li><strong>Tradeoff</strong>: minor departure from original paper</li>
+</ul>
+</section>
+<section id="fix-b-positive-bias-initialization-init-fix" class="level3">
+<h3 class="anchored" data-anchor-id="fix-b-positive-bias-initialization-init-fix">Fix B: Positive bias initialization (init fix)</h3>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>nn.init.constant_(<span class="va">self</span>.wh_head[<span class="op">-</span><span class="dv">1</span>].bias, <span class="fl">0.1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>Keeps original ReLU</li>
+<li>Output starts at ~0.1 (safely positive) → ReLU never kills it</li>
+<li><strong>Tradeoff</strong>: initial predictions are biased, but training corrects it quickly</li>
+</ul>
+</section>
+<section id="fix-c-softplus-smooth-activation" class="level3">
+<h3 class="anchored" data-anchor-id="fix-c-softplus-smooth-activation">Fix C: Softplus (smooth activation)</h3>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>wh <span class="op">=</span> F.softplus(<span class="va">self</span>.wh_head(x)) <span class="op">*</span> Config.wh_offset_base</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li><code>softplus(x) = log(1 + exp(x))</code> — smooth approximation of ReLU</li>
+<li>Never has zero gradient, always positive output</li>
+<li><strong>Tradeoff</strong>: slightly more compute than ReLU</li>
+</ul>
+</section>
+<section id="comparison-table" class="level3">
+<h3 class="anchored" data-anchor-id="comparison-table">Comparison Table</h3>
 <table class="caption-top table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+</colgroup>
 <thead>
 <tr class="header">
-<th>Composite Pattern</th>
-<th>Status</th>
+<th>Fix</th>
+<th>Matches Paper</th>
+<th>Prevents Dead Neurons</th>
+<th>Output Always Positive</th>
+<th>Compute Cost</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>nn.dense + bias_add</code></td>
+<td>ReLU (original)</td>
 <td>✅</td>
+<td>❌</td>
+<td>✅</td>
+<td>Cheapest</td>
 </tr>
 <tr class="even">
-<td><code>nn.dense + bias_add + relu</code></td>
+<td>Leaky ReLU</td>
+<td>❌</td>
 <td>✅</td>
+<td>❌</td>
+<td>Same</td>
 </tr>
 <tr class="odd">
-<td><code>nn.conv2d + bias_add + relu</code></td>
+<td>Positive bias init</td>
 <td>✅</td>
+<td>✅ (probabilistic)</td>
+<td>✅</td>
+<td>Same</td>
 </tr>
 <tr class="even">
-<td><code>reshape</code></td>
+<td>Softplus</td>
+<td>❌</td>
 <td>✅</td>
+<td>✅</td>
+<td>Slightly more</td>
+</tr>
+<tr class="odd">
+<td>Leaky ReLU + bias init</td>
+<td>❌</td>
+<td>✅✅</td>
+<td>❌</td>
+<td>Same</td>
 </tr>
 </tbody>
 </table>
 </section>
 </section>
-<section id="references" class="level2">
-<h2 class="anchored" data-anchor-id="references">References</h2>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Resource</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><a href="https://tvm.apache.org/">Apache TVM</a></td>
-<td>Open deep learning compiler stack</td>
-</tr>
-<tr class="even">
-<td><a href="https://tvm.apache.org/docs/dev/how_to/relay_bring_your_own_codegen.html">TVM BYOC Documentation</a></td>
-<td>Official guide for integrating external codegens</td>
-</tr>
-<tr class="odd">
-<td><a href="https://github.com/tencent/ncnn">ncnn</a></td>
-<td>Tencent’s high-performance neural network inference engine for mobile</td>
-</tr>
-</tbody>
-</table>
+<section id="the-broader-lesson-200-words" class="level2">
+<h2 class="anchored" data-anchor-id="the-broader-lesson-200-words">6. The Broader Lesson (~200 words)</h2>
+<ul>
+<li>“Dying ReLU” is a well-known problem, but usually discussed in hidden layers. Here it killed an <em>output</em> channel</li>
+<li>Lightweight backbones make downstream heads more fragile</li>
+<li><strong>Debugging tip</strong>: when bounding boxes are systematically shifted, dump per-channel statistics before checking the decode logic</li>
+<li><strong>Prevention</strong>: always verify that all output channels have non-zero statistics after a few training iterations — add this as a sanity check callback</li>
+</ul>
 </section>
-<section id="tech-stack" class="level2">
-<h2 class="anchored" data-anchor-id="tech-stack">Tech Stack</h2>
-<p>C++ · Python · Apache TVM (v0.13.0) · ncnn · Docker · Raspberry Pi 4B</p>
+<section id="bonus-a-pytorch-lightning-callback-for-early-detection-100-words" class="level2">
+<h2 class="anchored" data-anchor-id="bonus-a-pytorch-lightning-callback-for-early-detection-100-words">7. Bonus: A PyTorch Lightning Callback for Early Detection (~100 words)</h2>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> DeadChannelDetector(pl.Callback):</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> on_train_batch_end(<span class="va">self</span>, trainer, pl_module, outputs, batch, batch_idx):</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> batch_idx <span class="op">==</span> <span class="dv">100</span>:  <span class="co"># check after 100 iterations</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>            <span class="cf">with</span> torch.no_grad():</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>                bias <span class="op">=</span> pl_module.model.head.wh_head[<span class="op">-</span><span class="dv">1</span>].bias</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>                <span class="cf">for</span> ch <span class="kw">in</span> <span class="bu">range</span>(bias.shape[<span class="dv">0</span>]):</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">if</span> <span class="bu">abs</span>(bias[ch].item()) <span class="op">&lt;</span> <span class="fl">0.01</span>:</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>                        <span class="bu">print</span>(<span class="ss">f"⚠️ wh_head channel </span><span class="sc">{</span>ch<span class="sc">}</span><span class="ss"> may be dead (bias=</span><span class="sc">{</span>bias[ch]<span class="sc">:.4f}</span><span class="ss">)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="metadata" class="level2">
+<h2 class="anchored" data-anchor-id="metadata">Metadata</h2>
+<ul>
+<li><strong>Estimated length</strong>: ~1800 words + code blocks + images</li>
+<li><strong>Target audience</strong>: ML practitioners doing object detection</li>
+<li><strong>Tags</strong>: PyTorch, object detection, debugging, ReLU, weight initialization, TTFNet</li>
+</ul>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->

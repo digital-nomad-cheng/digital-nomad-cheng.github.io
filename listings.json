@@ -8,6 +8,14 @@
     ]
   },
   {
+    "listing": "/series/notes/index.html",
+    "items": []
+  },
+  {
+    "listing": "/series/tutorials/index.html",
+    "items": []
+  },
+  {
     "listing": "/index.html",
     "items": [
       "/posts/100-days-of-polars/2026-02-10-day009-s3-integration.html",

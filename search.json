@@ -7,6 +7,13 @@
     "text": "A collection of projects I’ve built to learn and experiment with deep learning, computer vision, and efficient ML.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nVision Transformers\n\n\n\n\n\n\nViT\n\n\nTransformers\n\n\nPyTorch\n\n\n\nFrom attention mechanisms to ViT, DETR, and SegFormer — implemented from scratch in PyTorch.\n\n\n\n\n\nFeb 15, 2026\n\n\n\n\n\n\n\n\n\n\n\n\nComputational Photography with Halide\n\n\n\n\n\n\nComputational Photography\n\n\nHalide\n\n\nC++\n\n\n\nImplementation of image processing pipelines and computational photography algorithms using the Halide domain-specific language.\n\n\n\n\n\nMay 15, 2024\n\n\n\n\n\n\n\n\n\n\n\n\nIntegrating ncnn with Apache TVM\n\n\n\n\n\n\nML Compilation\n\n\nEdge AI\n\n\nC++\n\n\n\nIntegrated Tencent’s ncnn inference engine into Apache TVM via BYOC, achieving 30% speedup over Arm Compute Library on Raspberry Pi 4B.\n\n\n\n\n\nOct 6, 2023\n\n\n\n\n\n\nNo matching items"
   },
   {
+    "objectID": "series/notes/index.html",
+    "href": "series/notes/index.html",
+    "title": "Notes",
+    "section": "",
+    "text": "No matching items"
+  },
+  {
     "objectID": "AWS_CREDENTIALS_GUIDE.html",
     "href": "AWS_CREDENTIALS_GUIDE.html",
     "title": "AWS Credentials Configuration Guide",
@@ -420,6 +427,76 @@
     "text": "Welcome! I’m a machine learning engineer focused on computer vision and efficient ML on edge devices.\nThis blog is where I document my learning journey — from Vision Transformers and ML compilation to day-to-day engineering with tools like Polars, PyTorch, and TFLite."
   },
   {
+    "objectID": "blog_plan.html",
+    "href": "blog_plan.html",
+    "title": "Blog Post Plan: The Silent Killer — How ReLU Murdered My Bounding Boxes",
+    "section": "",
+    "text": "A single dead neuron in a 4-channel output head caused every bounding box to lose its left edge. The model trained for hours, the loss converged, and inference produced confident detections — but every box only covered the right half of each person. Here’s how I found it, why it happened, and three ways to prevent it.\n\n\n\n\nWhat is TTFNet? Anchor-free detector, heatmap + 4-channel offset regression (left, top, right, bottom)\nThe lightweight twist: using MobileNetV3-Small instead of the original ResNet-18 + Deformable Conv backbone\nThe offset head: wh = F.relu(wh_head(x)) * wh_offset_base\nWhy ReLU? Offsets are distances from center to edges — should always be positive\n\n\n\n\n\nShow the broken inference result (boxes only covering right half of people)\n“The model is confident and boxes are at the right locations… but they’re all too narrow”\nInitial suspicion: decoding bug? scale mismatch? wrong channel order?\n\n\n\ngit clone &lt;repo&gt; && cd ttfnet\ngit checkout dead-relu-demo  # branch with the original bug\nuv sync\n./run.sh  # download dataset + train\n# After ~5 epochs, run inference:\nuv run python eval.py --checkpoint checkpoints/ttfnet-epoch=05-*.ckpt --image WiderPerson/Images/000089.jpg\n# Observe: boxes only cover right half of objects\n\n\n\n\n\n\n\nTrace get_bboxes: x1 = center_x - wh[0], x2 = center_x + wh[2]\nCompare against original TTFNet source — identical\nCompare against training loss computation — consistent\nConclusion: decode is correct\n\n\n\n\n# Debug script output:\nwh channel 0 (left):   min=0.000, max=0.000, mean=0.000  ← DEAD!\nwh channel 1 (top):    min=7.1,   max=210.1, mean=73.4\nwh channel 2 (right):  min=5.0,   max=67.4,  mean=26.5\nwh channel 3 (bottom): min=12.5,  max=225.2, mean=59.7\n\nChannel 0 is always exactly zero → x1 = center_x - 0 = center_x\nThat’s why boxes start at center and extend only right\n\n\n\n\nChannel 0: weight std=0.0004, bias=-0.004  ← never learned\nChannel 1: weight std=0.221,  bias=0.660   ← healthy\nChannel 2: weight std=0.083,  bias=0.518   ← healthy\nChannel 3: weight std=0.215,  bias=0.902   ← healthy\n\n\n\n\n\n\n\nInitialization: normal_init(std=0.001) → weights ≈ 0, bias = 0\nPre-activation output hovers around 0\nIf channel 0 drifts slightly negative early in training → ReLU clips to 0 → gradient = 0 → permanently dead\nClassic “dying ReLU” problem, but manifesting at the output channel level\n\n\n\n\n\nOriginal uses ResNet-18 backbone + Modulated Deformable Convolutions → richer features, stronger gradients\nMobileNetV3-Small produces weaker features → more prone to dead neurons in downstream heads\nIt’s a training dynamics issue, not a math issue — the architecture is correct\n\n\n\n\nPre-activation: -0.002 (slightly negative due to random init)\n         ↓\n     ReLU(x) = 0\n         ↓\n   Gradient = 0 (no learning signal)\n         ↓\n   Weight stays near 0 forever\n         ↓\n   Channel is dead ☠️\n\n\n\n\n\n\nwh = F.leaky_relu(self.wh_head(x)) * Config.wh_offset_base\n\nAllows 1% gradient for negative values\nOffsets can go slightly negative, but downstream clamp handles it\nTradeoff: minor departure from original paper\n\n\n\n\nnn.init.constant_(self.wh_head[-1].bias, 0.1)\n\nKeeps original ReLU\nOutput starts at ~0.1 (safely positive) → ReLU never kills it\nTradeoff: initial predictions are biased, but training corrects it quickly\n\n\n\n\nwh = F.softplus(self.wh_head(x)) * Config.wh_offset_base\n\nsoftplus(x) = log(1 + exp(x)) — smooth approximation of ReLU\nNever has zero gradient, always positive output\nTradeoff: slightly more compute than ReLU\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nFix\nMatches Paper\nPrevents Dead Neurons\nOutput Always Positive\nCompute Cost\n\n\n\n\nReLU (original)\n✅\n❌\n✅\nCheapest\n\n\nLeaky ReLU\n❌\n✅\n❌\nSame\n\n\nPositive bias init\n✅\n✅ (probabilistic)\n✅\nSame\n\n\nSoftplus\n❌\n✅\n✅\nSlightly more\n\n\nLeaky ReLU + bias init\n❌\n✅✅\n❌\nSame\n\n\n\n\n\n\n\n\n“Dying ReLU” is a well-known problem, but usually discussed in hidden layers. Here it killed an output channel\nLightweight backbones make downstream heads more fragile\nDebugging tip: when bounding boxes are systematically shifted, dump per-channel statistics before checking the decode logic\nPrevention: always verify that all output channels have non-zero statistics after a few training iterations — add this as a sanity check callback\n\n\n\n\nclass DeadChannelDetector(pl.Callback):\n    def on_train_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):\n        if batch_idx == 100:  # check after 100 iterations\n            with torch.no_grad():\n                bias = pl_module.model.head.wh_head[-1].bias\n                for ch in range(bias.shape[0]):\n                    if abs(bias[ch].item()) &lt; 0.01:\n                        print(f\"⚠️ wh_head channel {ch} may be dead (bias={bias[ch]:.4f})\")\n\n\n\n\nEstimated length: ~1800 words + code blocks + images\nTarget audience: ML practitioners doing object detection\nTags: PyTorch, object detection, debugging, ReLU, weight initialization, TTFNet"
+  },
+  {
+    "objectID": "blog_plan.html#hook",
+    "href": "blog_plan.html#hook",
+    "title": "Blog Post Plan: The Silent Killer — How ReLU Murdered My Bounding Boxes",
+    "section": "",
+    "text": "A single dead neuron in a 4-channel output head caused every bounding box to lose its left edge. The model trained for hours, the loss converged, and inference produced confident detections — but every box only covered the right half of each person. Here’s how I found it, why it happened, and three ways to prevent it."
+  },
+  {
+    "objectID": "blog_plan.html#the-setup-200-words",
+    "href": "blog_plan.html#the-setup-200-words",
+    "title": "Blog Post Plan: The Silent Killer — How ReLU Murdered My Bounding Boxes",
+    "section": "",
+    "text": "What is TTFNet? Anchor-free detector, heatmap + 4-channel offset regression (left, top, right, bottom)\nThe lightweight twist: using MobileNetV3-Small instead of the original ResNet-18 + Deformable Conv backbone\nThe offset head: wh = F.relu(wh_head(x)) * wh_offset_base\nWhy ReLU? Offsets are distances from center to edges — should always be positive"
+  },
+  {
+    "objectID": "blog_plan.html#the-symptom-150-words-images",
+    "href": "blog_plan.html#the-symptom-150-words-images",
+    "title": "Blog Post Plan: The Silent Killer — How ReLU Murdered My Bounding Boxes",
+    "section": "",
+    "text": "Show the broken inference result (boxes only covering right half of people)\n“The model is confident and boxes are at the right locations… but they’re all too narrow”\nInitial suspicion: decoding bug? scale mismatch? wrong channel order?\n\n\n\ngit clone &lt;repo&gt; && cd ttfnet\ngit checkout dead-relu-demo  # branch with the original bug\nuv sync\n./run.sh  # download dataset + train\n# After ~5 epochs, run inference:\nuv run python eval.py --checkpoint checkpoints/ttfnet-epoch=05-*.ckpt --image WiderPerson/Images/000089.jpg\n# Observe: boxes only cover right half of objects"
+  },
+  {
+    "objectID": "blog_plan.html#the-investigation-400-words",
+    "href": "blog_plan.html#the-investigation-400-words",
+    "title": "Blog Post Plan: The Silent Killer — How ReLU Murdered My Bounding Boxes",
+    "section": "",
+    "text": "Trace get_bboxes: x1 = center_x - wh[0], x2 = center_x + wh[2]\nCompare against original TTFNet source — identical\nCompare against training loss computation — consistent\nConclusion: decode is correct\n\n\n\n\n# Debug script output:\nwh channel 0 (left):   min=0.000, max=0.000, mean=0.000  ← DEAD!\nwh channel 1 (top):    min=7.1,   max=210.1, mean=73.4\nwh channel 2 (right):  min=5.0,   max=67.4,  mean=26.5\nwh channel 3 (bottom): min=12.5,  max=225.2, mean=59.7\n\nChannel 0 is always exactly zero → x1 = center_x - 0 = center_x\nThat’s why boxes start at center and extend only right\n\n\n\n\nChannel 0: weight std=0.0004, bias=-0.004  ← never learned\nChannel 1: weight std=0.221,  bias=0.660   ← healthy\nChannel 2: weight std=0.083,  bias=0.518   ← healthy\nChannel 3: weight std=0.215,  bias=0.902   ← healthy"
+  },
+  {
+    "objectID": "blog_plan.html#the-root-cause-300-words",
+    "href": "blog_plan.html#the-root-cause-300-words",
+    "title": "Blog Post Plan: The Silent Killer — How ReLU Murdered My Bounding Boxes",
+    "section": "",
+    "text": "Initialization: normal_init(std=0.001) → weights ≈ 0, bias = 0\nPre-activation output hovers around 0\nIf channel 0 drifts slightly negative early in training → ReLU clips to 0 → gradient = 0 → permanently dead\nClassic “dying ReLU” problem, but manifesting at the output channel level\n\n\n\n\n\nOriginal uses ResNet-18 backbone + Modulated Deformable Convolutions → richer features, stronger gradients\nMobileNetV3-Small produces weaker features → more prone to dead neurons in downstream heads\nIt’s a training dynamics issue, not a math issue — the architecture is correct\n\n\n\n\nPre-activation: -0.002 (slightly negative due to random init)\n         ↓\n     ReLU(x) = 0\n         ↓\n   Gradient = 0 (no learning signal)\n         ↓\n   Weight stays near 0 forever\n         ↓\n   Channel is dead ☠️"
+  },
+  {
+    "objectID": "blog_plan.html#three-fixes-300-words",
+    "href": "blog_plan.html#three-fixes-300-words",
+    "title": "Blog Post Plan: The Silent Killer — How ReLU Murdered My Bounding Boxes",
+    "section": "",
+    "text": "wh = F.leaky_relu(self.wh_head(x)) * Config.wh_offset_base\n\nAllows 1% gradient for negative values\nOffsets can go slightly negative, but downstream clamp handles it\nTradeoff: minor departure from original paper\n\n\n\n\nnn.init.constant_(self.wh_head[-1].bias, 0.1)\n\nKeeps original ReLU\nOutput starts at ~0.1 (safely positive) → ReLU never kills it\nTradeoff: initial predictions are biased, but training corrects it quickly\n\n\n\n\nwh = F.softplus(self.wh_head(x)) * Config.wh_offset_base\n\nsoftplus(x) = log(1 + exp(x)) — smooth approximation of ReLU\nNever has zero gradient, always positive output\nTradeoff: slightly more compute than ReLU\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nFix\nMatches Paper\nPrevents Dead Neurons\nOutput Always Positive\nCompute Cost\n\n\n\n\nReLU (original)\n✅\n❌\n✅\nCheapest\n\n\nLeaky ReLU\n❌\n✅\n❌\nSame\n\n\nPositive bias init\n✅\n✅ (probabilistic)\n✅\nSame\n\n\nSoftplus\n❌\n✅\n✅\nSlightly more\n\n\nLeaky ReLU + bias init\n❌\n✅✅\n❌\nSame"
+  },
+  {
+    "objectID": "blog_plan.html#the-broader-lesson-200-words",
+    "href": "blog_plan.html#the-broader-lesson-200-words",
+    "title": "Blog Post Plan: The Silent Killer — How ReLU Murdered My Bounding Boxes",
+    "section": "",
+    "text": "“Dying ReLU” is a well-known problem, but usually discussed in hidden layers. Here it killed an output channel\nLightweight backbones make downstream heads more fragile\nDebugging tip: when bounding boxes are systematically shifted, dump per-channel statistics before checking the decode logic\nPrevention: always verify that all output channels have non-zero statistics after a few training iterations — add this as a sanity check callback"
+  },
+  {
+    "objectID": "blog_plan.html#bonus-a-pytorch-lightning-callback-for-early-detection-100-words",
+    "href": "blog_plan.html#bonus-a-pytorch-lightning-callback-for-early-detection-100-words",
+    "title": "Blog Post Plan: The Silent Killer — How ReLU Murdered My Bounding Boxes",
+    "section": "",
+    "text": "class DeadChannelDetector(pl.Callback):\n    def on_train_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):\n        if batch_idx == 100:  # check after 100 iterations\n            with torch.no_grad():\n                bias = pl_module.model.head.wh_head[-1].bias\n                for ch in range(bias.shape[0]):\n                    if abs(bias[ch].item()) &lt; 0.01:\n                        print(f\"⚠️ wh_head channel {ch} may be dead (bias={bias[ch]:.4f})\")"
+  },
+  {
+    "objectID": "blog_plan.html#metadata",
+    "href": "blog_plan.html#metadata",
+    "title": "Blog Post Plan: The Silent Killer — How ReLU Murdered My Bounding Boxes",
+    "section": "",
+    "text": "Estimated length: ~1800 words + code blocks + images\nTarget audience: ML practitioners doing object detection\nTags: PyTorch, object detection, debugging, ReLU, weight initialization, TTFNet"
+  },
+  {
     "objectID": "about.html",
     "href": "about.html",
     "title": "About",
@@ -439,6 +516,13 @@
     "title": "About",
     "section": "Interests",
     "text": "Interests\n\n🔭 Deep learning model optimization for edge deployment\n📷 Computer vision & image processing\n⚡ ML compilation & efficient inference\n🧠 Vision Transformers & attention mechanisms"
+  },
+  {
+    "objectID": "about.html#how-i-help",
+    "href": "about.html#how-i-help",
+    "title": "About",
+    "section": "How I Help",
+    "text": "How I Help\n\nEdge ML Optimization & Deployment: Bringing complex deep learning models to resource-constrained devices.\nComputer Vision System Development: Designing robust architectures for object detection, tracking, and segmentation.\nCustom AI Solution Architecture: Crafting end-to-end pipelines tailored to specific tasks and hardware.\nModel Compilation & Inference Acceleration: Maximizing throughput and minimizing latency for real-time applications."
   },
   {
     "objectID": "posts/2025-08-05-tfl-vs-tflm/index.html",
@@ -910,9 +994,16 @@
     "text": "🛠️ Skills\n\n\n\n\n\n\n\nArea\nTechnologies\n\n\n\n\nSpecialization\nDigital Image Processing, Computer Vision, Object Detection, Object Segmentation, Edge Computing, Efficient ML\n\n\nFrameworks\nPyTorch, Keras, TensorFlow, TFLite/Micro, Apache TVM\n\n\nLanguages\nPython, C++"
   },
   {
+    "objectID": "series/tutorials/index.html",
+    "href": "series/tutorials/index.html",
+    "title": "Tutorials",
+    "section": "",
+    "text": "No matching items"
+  },
+  {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "Blogs",
+    "title": "Latest",
     "section": "",
     "text": "100 Days of Polars - Day 009: Working with S3\n\n\n\n\n\n\npolars\n\n\ndata-engineering\n\n\ns3\n\n\ncloud\n\n\n100-days-of-polars\n\n\n\nHow to read, scan, and analyze Parquet data on S3 directly from Polars — with lazy evaluation, anonymous access, and streaming\n\n\n\n\n\nFeb 10, 2026\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\n100 Days of Polars - Day 008: Join\n\n\n\n\n\n\npolars\n\n\ndata-engineering\n\n\njoins\n\n\n100-days-of-polars\n\n\n\nComprehensive guide to all join types in Polars with practical examples\n\n\n\n\n\nFeb 8, 2026\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\n100 Days of Polars - Day 007: Date/Time — Parsing, Durations, and Time Zones\n\n\n\n\n\n\npolars\n\n\ndatetime\n\n\n100-days-of-polars\n\n\n\nPractical guide to parsing dates/times, working with durations, and handling time zones in Polars\n\n\n\n\n\nFeb 3, 2026\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\n100 Days of Polars - Day 006: Data Integrity - Handling Nulls and Schema Validation\n\n\n\n\n\n\npolars\n\n\ndata-engineering\n\n\n100-days-of-polars\n\n\n\nLearn to maintain data integrity in Polars through null handling techniques and schema validation strategies\n\n\n\n\n\nFeb 2, 2026\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\n100 Days of Polars - Day 005: Working with Structs - Nested Data Structures\n\n\n\n\n\n\npolars\n\n\ndata-engineering\n\n\n100-days-of-polars\n\n\n\nUnderstanding how to work with struct columns in Polars for hierarchical and nested data\n\n\n\n\n\nJan 29, 2026\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\n100 Days of Polars - Day 004: Working with Lists - explode, implode, and List Operations\n\n\n\n\n\n\npolars\n\n\ndata-engineering\n\n\n100-days-of-polars\n\n\n\nUnderstanding how to work with nested list data in Polars using explode, implode, and list operations\n\n\n\n\n\nJan 28, 2026\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\n100 Days of Polars - Day 003: map_elements vs map_batches vs Native Expressions\n\n\n\n\n\n\npolars\n\n\ndata-engineering\n\n\n100-days-of-polars\n\n\n\nUnderstanding when to use map_elements, map_batches, and native Polars expressions\n\n\n\n\n\nJan 19, 2026\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\n100 Days of Polars - Day 002: Window Functions\n\n\n\n\n\n\npolars\n\n\ndata-engineering\n\n\n100-days-of-polars\n\n\n\nMaster window functions in Polars for advanced data transformations\n\n\n\n\n\nJan 18, 2026\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\n100 Days of Polars - Day 001: Polars Selectors\n\n\n\n\n\n\npolars\n\n\ndata-engineering\n\n\n100-days-of-polars\n\n\n\nPolars selectors for efficient column selection\n\n\n\n\n\nJan 17, 2026\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\nDifference between TFLite Python API vs TFLite Micro Python API\n\n\n\n\n\n\ntflite\n\n\ntflite-micro\n\n\ncode\n\n\ntinyml\n\n\n\n\n\n\n\n\n\nAug 5, 2025\n\n\nNomadC\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\n\n\n\nnews\n\n\n\n\n\n\n\n\n\nAug 2, 2025\n\n\nNomadC\n\n\n\n\n\n\nNo matching items"
   }

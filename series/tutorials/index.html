@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Blogs – Nomad’s Wonderland</title>
+<title>Tutorials – Nomad’s Wonderland</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,24 +23,27 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-listing/list.min.js"></script>
-<script src="site_libs/quarto-listing/quarto-listing.js"></script>
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-863c515d4be54b18c75ead57ba7b0de2.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../favicon.png" rel="icon" type="image/png">
+<script src="../../site_libs/quarto-listing/list.min.js"></script>
+<script src="../../site_libs/quarto-listing/quarto-listing.js"></script>
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-b53751a350365c71b6c909e95f209ed1.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-863c515d4be54b18c75ead57ba7b0de2.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-72d3f41041cee2253cddee09417ee136.min.css" rel="prefetch" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -78,9 +81,9 @@ ul.task-list li input[type="checkbox"] {
     }
 
     const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      valueNames: ['listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
       
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
+      searchColumns: ["listing-categories"],
     };
 
     window['quarto-listings'] = window['quarto-listings'] || {};
@@ -128,17 +131,23 @@ window.Quarto = {
 };
 </script>
 
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="Tutorials – Nomad’s Wonderland">
+<meta property="og:description" content="Step-by-step guides and tutorials.">
+<meta property="og:site_name" content="Nomad's Wonderland">
+<meta name="twitter:title" content="Tutorials – Nomad’s Wonderland">
+<meta name="twitter:description" content="Step-by-step guides and tutorials.">
+<meta name="twitter:card" content="summary">
 </head>
 
 <body class="nav-fixed">
 
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+  <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">Nomad’s Wonderland</span>
     </a>
   </div>
@@ -149,20 +158,28 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./index.html" aria-current="page"> 
-<span class="menu-text">Home</span></a>
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Latest</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./projects.html"> 
+    <a class="nav-link" href="../../projects.html"> 
 <span class="menu-text">Projects</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./cv.html"> 
+    <a class="nav-link active" href="../../series/tutorials/index.html" aria-current="page"> 
+<span class="menu-text">Tutorials</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../series/notes/index.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../cv.html"> 
 <span class="menu-text">CV</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./about.html"> 
-<span class="menu-text">About</span></a>
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About Me</span></a>
   </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
@@ -179,38 +196,39 @@ window.Quarto = {
 </ul>
           </div> <!-- /navcollapse -->
             <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
 </div>
       </div> <!-- /container-fluid -->
     </nav>
 </header>
 <!-- content -->
-<header id="title-block-header" class="quarto-title-block default page-columns page-full">
-  <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-page-left">
-      <h1 class="title">Blogs</h1>
-                      </div>
-  </div>
-    
-  
-  <div class="quarto-title-meta column-page-left">
-
-      
-    
-      
-    </div>
-    
-  
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(8)</span></div><div class="category" data-category="MTAwLWRheXMtb2YtcG9sYXJz">100-days-of-polars <span class="quarto-category-count">(6)</span></div><div class="category" data-category="Y29kZQ==">code <span class="quarto-category-count">(1)</span></div><div class="category" data-category="ZGF0YS1lbmdpbmVlcmluZw==">data-engineering <span class="quarto-category-count">(6)</span></div><div class="category" data-category="bmV3cw==">news <span class="quarto-category-count">(1)</span></div><div class="category" data-category="cG9sYXJz">polars <span class="quarto-category-count">(6)</span></div><div class="category" data-category="dGZsaXRl">tflite <span class="quarto-category-count">(1)</span></div><div class="category" data-category="dGZsaXRlLW1pY3Jv">tflite-micro <span class="quarto-category-count">(1)</span></div><div class="category" data-category="dGlueW1s">tinyml <span class="quarto-category-count">(1)</span></div></div></div>
+    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(0)</span></div></div></div>
 <!-- main -->
-<main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
+<main class="content column-page-left" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Tutorials</h1>
+<p class="subtitle lead">Step-by-step guides and tutorials.</p>
+</div>
 
 
 
+<div class="quarto-title-meta column-page-left">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
 
 
 
@@ -219,315 +237,7 @@ window.Quarto = {
 
 <div class="quarto-listing quarto-listing-container-default" id="listing-listing">
 <div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="cG9sYXJzJTJDZGF0YS1lbmdpbmVlcmluZyUyQzEwMC1kYXlzLW9mLXBvbGFycw==" data-listing-date-sort="1769986800000" data-listing-file-modified-sort="1770056248012" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="18" data-listing-word-count-sort="3466">
-<div class="thumbnail">
-<p><a href="./posts/100-days-of-polars/2026-02-02-day006-data-integrity.html" class="no-external"></a></p><a href="./posts/100-days-of-polars/2026-02-02-day006-data-integrity.html" class="no-external">
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-</a><p><a href="./posts/100-days-of-polars/2026-02-02-day006-data-integrity.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/100-days-of-polars/2026-02-02-day006-data-integrity.html" class="no-external">100 Days of Polars - Day 006: Data Integrity - Handling Nulls and Schema Validation</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/100-days-of-polars/2026-02-02-day006-data-integrity.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('cG9sYXJz'); return false;">
-polars
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('ZGF0YS1lbmdpbmVlcmluZw=='); return false;">
-data-engineering
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('MTAwLWRheXMtb2YtcG9sYXJz'); return false;">
-100-days-of-polars
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/100-days-of-polars/2026-02-02-day006-data-integrity.html" class="no-external">Learn to maintain data integrity in Polars through null handling techniques and schema validation strategies</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/100-days-of-polars/2026-02-02-day006-data-integrity.html" class="no-external">
-<div class="listing-date">
-Feb 2, 2026
-</div>
-<div class="listing-author">
-NomadC
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="1" data-categories="cG9sYXJzJTJDZGF0YS1lbmdpbmVlcmluZyUyQzEwMC1kYXlzLW9mLXBvbGFycw==" data-listing-date-sort="1769641200000" data-listing-file-modified-sort="1769971323978" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="12" data-listing-word-count-sort="2212">
-<div class="thumbnail">
-<p><a href="./posts/100-days-of-polars/2026-01-29-day005-structs.html" class="no-external"></a></p><a href="./posts/100-days-of-polars/2026-01-29-day005-structs.html" class="no-external">
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-</a><p><a href="./posts/100-days-of-polars/2026-01-29-day005-structs.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/100-days-of-polars/2026-01-29-day005-structs.html" class="no-external">100 Days of Polars - Day 005: Working with Structs - Nested Data Structures</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/100-days-of-polars/2026-01-29-day005-structs.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('cG9sYXJz'); return false;">
-polars
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('ZGF0YS1lbmdpbmVlcmluZw=='); return false;">
-data-engineering
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('MTAwLWRheXMtb2YtcG9sYXJz'); return false;">
-100-days-of-polars
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/100-days-of-polars/2026-01-29-day005-structs.html" class="no-external">Understanding how to work with struct columns in Polars for hierarchical and nested data</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/100-days-of-polars/2026-01-29-day005-structs.html" class="no-external">
-<div class="listing-date">
-Jan 29, 2026
-</div>
-<div class="listing-author">
-NomadC
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="2" data-categories="cG9sYXJzJTJDZGF0YS1lbmdpbmVlcmluZyUyQzEwMC1kYXlzLW9mLXBvbGFycw==" data-listing-date-sort="1769554800000" data-listing-file-modified-sort="1769630039537" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="14" data-listing-word-count-sort="2717">
-<div class="thumbnail">
-<p><a href="./posts/100-days-of-polars/2026-01-28-day004-explode-lists.html" class="no-external"></a></p><a href="./posts/100-days-of-polars/2026-01-28-day004-explode-lists.html" class="no-external">
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-</a><p><a href="./posts/100-days-of-polars/2026-01-28-day004-explode-lists.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/100-days-of-polars/2026-01-28-day004-explode-lists.html" class="no-external">100 Days of Polars - Day 004: Working with Lists - explode, implode, and List Operations</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/100-days-of-polars/2026-01-28-day004-explode-lists.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('cG9sYXJz'); return false;">
-polars
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('ZGF0YS1lbmdpbmVlcmluZw=='); return false;">
-data-engineering
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('MTAwLWRheXMtb2YtcG9sYXJz'); return false;">
-100-days-of-polars
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/100-days-of-polars/2026-01-28-day004-explode-lists.html" class="no-external">Understanding how to work with nested list data in Polars using explode, implode, and list operations</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/100-days-of-polars/2026-01-28-day004-explode-lists.html" class="no-external">
-<div class="listing-date">
-Jan 28, 2026
-</div>
-<div class="listing-author">
-NomadC
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="3" data-categories="cG9sYXJzJTJDZGF0YS1lbmdpbmVlcmluZyUyQzEwMC1kYXlzLW9mLXBvbGFycw==" data-listing-date-sort="1768777200000" data-listing-file-modified-sort="1768857636434" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3" data-listing-word-count-sort="520">
-<div class="thumbnail">
-<p><a href="./posts/100-days-of-polars/2026-01-19-day003-map-functions.html" class="no-external"></a></p><a href="./posts/100-days-of-polars/2026-01-19-day003-map-functions.html" class="no-external">
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-</a><p><a href="./posts/100-days-of-polars/2026-01-19-day003-map-functions.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/100-days-of-polars/2026-01-19-day003-map-functions.html" class="no-external">100 Days of Polars - Day 003: map_elements vs map_batches vs Native Expressions</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/100-days-of-polars/2026-01-19-day003-map-functions.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('cG9sYXJz'); return false;">
-polars
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('ZGF0YS1lbmdpbmVlcmluZw=='); return false;">
-data-engineering
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('MTAwLWRheXMtb2YtcG9sYXJz'); return false;">
-100-days-of-polars
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/100-days-of-polars/2026-01-19-day003-map-functions.html" class="no-external">Understanding when to use map_elements, map_batches, and native Polars expressions</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/100-days-of-polars/2026-01-19-day003-map-functions.html" class="no-external">
-<div class="listing-date">
-Jan 19, 2026
-</div>
-<div class="listing-author">
-NomadC
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="4" data-categories="cG9sYXJzJTJDZGF0YS1lbmdpbmVlcmluZyUyQzEwMC1kYXlzLW9mLXBvbGFycw==" data-listing-date-sort="1768690800000" data-listing-file-modified-sort="1768767605064" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3" data-listing-word-count-sort="410">
-<div class="thumbnail">
-<p><a href="./posts/100-days-of-polars/2026-01-18-day002-window-function.html" class="no-external"></a></p><a href="./posts/100-days-of-polars/2026-01-18-day002-window-function.html" class="no-external">
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-</a><p><a href="./posts/100-days-of-polars/2026-01-18-day002-window-function.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/100-days-of-polars/2026-01-18-day002-window-function.html" class="no-external">100 Days of Polars - Day 002: Window Functions</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/100-days-of-polars/2026-01-18-day002-window-function.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('cG9sYXJz'); return false;">
-polars
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('ZGF0YS1lbmdpbmVlcmluZw=='); return false;">
-data-engineering
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('MTAwLWRheXMtb2YtcG9sYXJz'); return false;">
-100-days-of-polars
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/100-days-of-polars/2026-01-18-day002-window-function.html" class="no-external">Master window functions in Polars for advanced data transformations</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/100-days-of-polars/2026-01-18-day002-window-function.html" class="no-external">
-<div class="listing-date">
-Jan 18, 2026
-</div>
-<div class="listing-author">
-NomadC
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="5" data-categories="cG9sYXJzJTJDZGF0YS1lbmdpbmVlcmluZyUyQzEwMC1kYXlzLW9mLXBvbGFycw==" data-listing-date-sort="1768604400000" data-listing-file-modified-sort="1768684047254" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="4" data-listing-word-count-sort="759">
-<div class="thumbnail">
-<p><a href="./posts/100-days-of-polars/2026-01-17-day001-selectors.html" class="no-external"></a></p><a href="./posts/100-days-of-polars/2026-01-17-day001-selectors.html" class="no-external">
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-</a><p><a href="./posts/100-days-of-polars/2026-01-17-day001-selectors.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/100-days-of-polars/2026-01-17-day001-selectors.html" class="no-external">100 Days of Polars - Day 001: Polars Selectors</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/100-days-of-polars/2026-01-17-day001-selectors.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('cG9sYXJz'); return false;">
-polars
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('ZGF0YS1lbmdpbmVlcmluZw=='); return false;">
-data-engineering
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('MTAwLWRheXMtb2YtcG9sYXJz'); return false;">
-100-days-of-polars
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/100-days-of-polars/2026-01-17-day001-selectors.html" class="no-external">Polars selectors for efficient column selection</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/100-days-of-polars/2026-01-17-day001-selectors.html" class="no-external">
-<div class="listing-date">
-Jan 17, 2026
-</div>
-<div class="listing-author">
-NomadC
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="6" data-categories="dGZsaXRlJTJDdGZsaXRlLW1pY3JvJTJDY29kZSUyQ3RpbnltbA==" data-listing-date-sort="1754344800000" data-listing-file-modified-sort="1768684047254" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="6" data-listing-word-count-sort="1056">
-<div class="thumbnail">
-<p><a href="./posts/2025-08-05-tfl-vs-tflm/index.html" class="no-external"></a></p><a href="./posts/2025-08-05-tfl-vs-tflm/index.html" class="no-external">
-<p><img loading="lazy" src="./posts/2025-08-05-tfl-vs-tflm/image.jpg" class="thumbnail-image"></p>
-</a><p><a href="./posts/2025-08-05-tfl-vs-tflm/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/2025-08-05-tfl-vs-tflm/index.html" class="no-external">Difference between TFLite Python API vs TFLite Micro Python API</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/2025-08-05-tfl-vs-tflm/index.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('dGZsaXRl'); return false;">
-tflite
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('dGZsaXRlLW1pY3Jv'); return false;">
-tflite-micro
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('Y29kZQ=='); return false;">
-code
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('dGlueW1s'); return false;">
-tinyml
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/2025-08-05-tfl-vs-tflm/index.html" class="no-external"></a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/2025-08-05-tfl-vs-tflm/index.html" class="no-external">
-<div class="listing-date">
-Aug 5, 2025
-</div>
-<div class="listing-author">
-NomadC
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="7" data-categories="bmV3cw==" data-listing-date-sort="1754085600000" data-listing-file-modified-sort="1768684047254" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="32">
-<div class="thumbnail">
-<p><a href="./posts/welcome/index.html" class="no-external"></a></p><a href="./posts/welcome/index.html" class="no-external">
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-</a><p><a href="./posts/welcome/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/welcome/index.html" class="no-external">Welcome To My Blog</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/welcome/index.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('bmV3cw=='); return false;">
-news
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/welcome/index.html" class="no-external"></a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/welcome/index.html" class="no-external">
-<div class="listing-date">
-Aug 2, 2025
-</div>
-<div class="listing-author">
-Tristan O’Malley
-</div>
-</a>
-</div>
-</div>
+
 </div>
 <div class="listing-no-matching d-none">
 No matching items
@@ -553,6 +263,150 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
   }
   toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+    const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+    const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+    let newTheme = '';
+    if(darkModeDefault) {
+      newTheme = isAlternate ? baseTheme : alternateTheme;
+    } else {
+      newTheme = isAlternate ? alternateTheme : baseTheme;
+    }
+    const changeGiscusTheme = () => {
+      // From: https://github.com/giscus/giscus/issues/336
+      const sendMessage = (message) => {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+      }
+      sendMessage({
+        setConfig: {
+          theme: newTheme
+        }
+      });
+    }
+    const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+    if (isGiscussLoaded) {
+      changeGiscusTheme();
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  const darkModeDefault = false;
+  let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+    toggleGiscusIfUsed(toAlternate, darkModeDefault);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
   const icon = "";
   const anchorJS = new window.AnchorJS();
   anchorJS.options = {
@@ -623,7 +477,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
+      var filterRegex = new RegExp("https:\/\/digital-nomad-cheng\.github\.io\/");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
