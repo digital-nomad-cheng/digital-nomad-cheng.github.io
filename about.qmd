@@ -23,3 +23,10 @@ I mainly work with image-related tasks — from image signal processing, to obje
 - 📷 Computer vision & image processing
 - ⚡ ML compilation & efficient inference
 - 🧠 Vision Transformers & attention mechanisms
+
+## How I Help
+
+- **Edge ML Optimization & Deployment**: Bringing complex deep learning models to resource-constrained devices.
+- **Computer Vision System Development**: Designing robust architectures for object detection, tracking, and segmentation.
+- **Custom AI Solution Architecture**: Crafting end-to-end pipelines tailored to specific tasks and hardware.
+- **Model Compilation & Inference Acceleration**: Maximizing throughput and minimizing latency for real-time applications.

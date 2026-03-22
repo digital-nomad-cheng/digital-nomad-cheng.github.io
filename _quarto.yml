@@ -10,13 +10,17 @@ website:
   navbar:
     left:
       - href: index.qmd
-        text: Home
+        text: Latest
       - href: projects.qmd
         text: Projects
+      - href: series/tutorials/index.qmd
+        text: Tutorials
+      - href: series/notes/index.qmd
+        text: Notes
       - href: cv.qmd
         text: CV
-      - about.qmd
-      
+      - href: about.qmd
+        text: About Me
     right:
       - icon: github
         href: https://github.com/digital-nomad-cheng
